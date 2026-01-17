@@ -15,7 +15,11 @@ interface SearchResponse {
   headlines: SearchResult[];
 }
 
-export default function SearchBar() {
+interface SearchBarProps {
+  onAnalyze?: (topic: string) => void;
+}
+
+export default function SearchBar({ onAnalyze }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -84,8 +88,10 @@ export default function SearchBar() {
     }, 500);
   };
 
-  const handleResultClick = (url: string) => {
-    window.open(url, '_blank');
+  const handleResultClick = (url: string, headline: string) => {
+    if (onAnalyze) {
+      onAnalyze(headline);
+    }
     setIsOpen(false);
     setQuery('');
     setResults([]);
@@ -134,16 +140,31 @@ export default function SearchBar() {
         className={`absolute top-full mt-2 w-full rounded-2xl bg-black/90 backdrop-blur-xl 
                     border border-yellow-600/30 shadow-2xl shadow-black/70 overflow-hidden
                     transition-all duration-300 ease-out origin-top z-50
-                    ${isOpen && results.length > 0 
+                    ${(isOpen && results.length > 0) || isLoading
                       ? 'opacity-100 scale-100 max-h-96' 
                       : 'opacity-0 scale-95 max-h-0 pointer-events-none'
                     }`}
       >
-        <div className="max-h-96 overflow-y-auto custom-scrollbar">
+        {/* Loading State */}
+        {isLoading && (
+          <div className="p-8 flex flex-col items-center justify-center">
+            <div className="w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+            <p 
+              className="text-yellow-500 text-sm tracking-wider"
+              style={{ fontFamily: 'monospace, Courier New, Courier' }}
+            >
+              Loading results...
+            </p>
+          </div>
+        )}
+
+        {/* Results List */}
+        {!isLoading && (
+          <div className="max-h-96 overflow-y-auto custom-scrollbar">
           {results.map((result, index) => (
             <div
               key={index}
-              onClick={() => handleResultClick(result.url)}
+              onClick={() => handleResultClick(result.url, result.headline)}
               className="p-4 border-b border-yellow-600/10 hover:bg-yellow-600/10 
                          cursor-pointer transition-all duration-200 group"
               style={{ color: '#ffffff' }}
@@ -166,9 +187,10 @@ export default function SearchBar() {
             </div>
           ))}
         </div>
+        )}
 
         {/* Results count footer */}
-        {results.length > 0 && (
+        {!isLoading && results.length > 0 && (
           <div className="px-4 py-2 bg-black/50 border-t border-yellow-600/20">
             <p className="text-xs tracking-wider"
                style={{ 

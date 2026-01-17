@@ -9,6 +9,13 @@ interface NewsItem {
     location: string;
     topic: string;
     headline: string;
+    date_analyzed: string;
+    perspectives: any[];
+    common_facts: string[];
+    key_disagreements: string[];
+    social_media_voices: any[];
+    summary: string;
+    information_quality: string;
   };
 }
 
@@ -19,7 +26,11 @@ interface DailyNewsResponse {
   news: NewsItem[];
 }
 
-export default function TrendingNews() {
+interface TrendingNewsProps {
+  onAnalyze?: (analysis: any) => void;
+}
+
+export default function TrendingNews({ onAnalyze }: TrendingNewsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +82,11 @@ export default function TrendingNews() {
             <div className="empty-state">No news</div>
           ) : (
             newsItems.map((item) => (
-              <div key={item.rank} className="news-item">
+              <div 
+                key={item.rank} 
+                className="news-item"
+                onClick={() => onAnalyze && onAnalyze(item.analysis)}
+              >
                 <div className="news-rank">#{item.rank}</div>
                 <div className="news-content">
                   <h3 className="news-title">{item.analysis.headline}</h3>

@@ -3,10 +3,14 @@
 import Globe from '@/components/Globe';
 import TrendingNews from '@/components/TrendingNews';
 import SearchBar from '@/components/SearchBar';
-import { useEffect, useRef } from 'react';
+import AnalysisView from '@/components/AnalysisView';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const parallaxRef = useRef<HTMLDivElement>(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [analysisData, setAnalysisData] = useState<any>(null);
+  const [analysisTopic, setAnalysisTopic] = useState<string | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -21,6 +25,24 @@ export default function Home() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  const handleSearchAnalyze = (topic: string) => {
+    setAnalysisTopic(topic);
+    setAnalysisData(null);
+    setShowAnalysis(true);
+  };
+
+  const handleTrendingAnalyze = (analysis: any) => {
+    setAnalysisData(analysis);
+    setAnalysisTopic(null);
+    setShowAnalysis(true);
+  };
+
+  const handleCloseAnalysis = () => {
+    setShowAnalysis(false);
+    setAnalysisData(null);
+    setAnalysisTopic(null);
+  };
+
   return (
     <main className="w-full h-screen overflow-hidden relative">
       {/* Parallax Starfield Background */}
@@ -34,6 +56,7 @@ export default function Home() {
           pointerEvents: 'none',
         }}
       />
+      
       {/* Header Overlay */}
       <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/60 to-transparent p-6">
         <div className="flex justify-between items-start">
@@ -46,13 +69,13 @@ export default function Home() {
           
           {/* Search Bar - Top Right */}
           <div className="pointer-events-auto">
-            <SearchBar />
+            <SearchBar onAnalyze={handleSearchAnalyze} />
           </div>
         </div>
       </div>
 
       {/* Trending News Sidebar */}
-      <TrendingNews />
+      <TrendingNews onAnalyze={handleTrendingAnalyze} />
 
       {/* Globe Component */}
       <div className="absolute inset-0 z-10">
@@ -81,6 +104,16 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Analysis View Modal */}
+      {showAnalysis && (
+        <AnalysisView
+          analysis={analysisData}
+          topic={analysisTopic}
+          location="Global"
+          onClose={handleCloseAnalysis}
+        />
+      )}
     </main>
   );
 }
