@@ -6,7 +6,11 @@ import os
 import json
 from datetime import datetime
 from pathlib import Path
-from agent import NewsAnalysisAgent, NewsAnalysis
+from dotenv import load_dotenv
+from src.agent import NewsAnalysisAgent, NewsAnalysis
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = FastAPI(
     title="Multi-Perspective News Analysis API",
@@ -28,6 +32,17 @@ app.add_middleware(
 class AnalysisRequest(BaseModel):
     location: str
     topic: Optional[str] = None
+
+
+class SearchRequest(BaseModel):
+    topic: str
+
+
+class SearchResponse(BaseModel):
+    topic: str
+    searched_at: str
+    count: int
+    headlines: List[Dict[str, str]]  # List of {headline, source, url}
 
 
 # Initialize agent (will be done on startup)
@@ -73,7 +88,7 @@ def is_cache_valid() -> bool:
 
 
 async def fetch_daily_news() -> Dict[str, Any]:
-    """Fetch top 10 global news headlines using Tavily search"""
+    """Fetch top 10 global news headlines and analyze each through full unbiased pipeline"""
     if agent is None:
         return {"error": "Agent not initialized"}
     
@@ -84,38 +99,99 @@ async def fetch_daily_news() -> Dict[str, Any]:
         tavily_key = os.getenv("TAVILY_API_KEY")
         search = TavilySearch(api_key=tavily_key, max_results=10)
         
-        print("🌍 Fetching top 10 global news headlines...")
-        results = await search.ainvoke("top 10 global news headlines today")
+        print("\n" + "="*80)
+        print("🌍 FETCHING TOP 10 GLOBAL NEWS")
+        print("="*80)
+        print("📰 Step 1: Getting headlines...")
         
-        # Parse results into structured format
-        news_items = []
-        if isinstance(results, str):
-            # Parse the string response
-            lines = results.split('\n')
-            for line in lines[:10]:
-                if line.strip():
-                    news_items.append({
-                        "headline": line.strip(),
-                        "source": "Global News"
-                    })
+        # Tavily returns a list of dicts with 'content', 'title', 'url', etc.
+        results = await search.ainvoke("latest breaking global news today")
+        
+        print(f"\n🔍 DEBUG: Type of results: {type(results)}")
+        if isinstance(results, dict):
+            print(f"🔍 DEBUG: Dict keys: {results.keys()}")
+            if 'results' in results:
+                print(f"🔍 DEBUG: Number of items in results: {len(results['results'])}")
+        
+        # Parse results into headlines
+        headlines = []
+        
+        # Tavily returns a dict with 'results' key containing list of articles
+        if isinstance(results, dict) and 'results' in results:
+            for item in results['results']:
+                if isinstance(item, dict):
+                    # Get title from each result
+                    headline = item.get('title', '').strip()
+                    if headline and headline not in headlines:  # Avoid duplicates
+                        headlines.append(headline)
         elif isinstance(results, list):
-            # Tavily returns list of dicts
-            for item in results[:10]:
-                news_items.append({
-                    "headline": item.get('title', item.get('content', '')[:100]),
-                    "source": item.get('source', 'Unknown'),
-                    "url": item.get('url', '')
+            for item in results:
+                if isinstance(item, dict):
+                    headline = item.get('title') or item.get('content', '')[:200]
+                    if headline and headline not in headlines:
+                        headlines.append(headline.strip())
+        elif isinstance(results, str):
+            # If it's a string, split by newlines
+            lines = results.split('\n')
+            for line in lines:
+                if line.strip() and len(line.strip()) > 20:
+                    headlines.append(line.strip())
+                    if len(headlines) >= 10:
+                        break
+        
+        # Limit to 10
+        headlines = headlines[:10]
+        
+        print(f"✅ Found {len(headlines)} headlines")
+        
+        # Now analyze each headline through full pipeline
+        print(f"\n🔄 Step 2: Analyzing each headline (this will take ~5-10 minutes)...\n")
+        analyzed_news = []
+        
+        for i, headline in enumerate(headlines, 1):
+            try:
+                print(f"\n{'─'*80}")
+                print(f"📊 Analyzing {i}/{len(headlines)}: {headline[:60]}...")
+                print(f"{'─'*80}")
+                
+                # Run through full unbiased analysis pipeline
+                analysis = await agent.analyze_news(
+                    location="Global",
+                    topic=headline
+                )
+                
+                analyzed_news.append({
+                    "rank": i,
+                    "headline": headline,
+                    "analysis": analysis.dict()  # Full NewsAnalysis object
+                })
+                
+                print(f"✅ [{i}/{len(headlines)}] Complete!")
+                
+            except Exception as e:
+                print(f"⚠️  Error analyzing headline {i}: {e}")
+                # Still add it but with error
+                analyzed_news.append({
+                    "rank": i,
+                    "headline": headline,
+                    "error": str(e),
+                    "analysis": None
                 })
         
         news_data = {
             "date": datetime.now().strftime('%Y-%m-%d'),
             "fetched_at": datetime.now().isoformat(),
-            "count": len(news_items),
-            "news": news_items
+            "count": len(analyzed_news),
+            "news": analyzed_news
         }
         
         save_daily_news(news_data)
-        print(f"✅ Fetched {len(news_items)} news headlines")
+        
+        print(f"\n{'='*80}")
+        print(f"✅ DAILY NEWS CACHE COMPLETE")
+        print(f"   Analyzed: {len(analyzed_news)} stories")
+        print(f"   Saved to: {CACHE_FILE}")
+        print(f"{'='*80}\n")
         
         return news_data
         
@@ -162,7 +238,8 @@ def hello():
         "message": "Multi-Perspective News Analysis API",
         "status": "running",
         "endpoints": {
-            "POST /analyze": "Analyze news from multiple perspectives",
+            "POST /search": "Search for headlines about any topic (fast, 1-2s)",
+            "POST /analyze": "Get full multi-perspective analysis (30-60s)",
             "GET /daily-news": "Get top 10 global news headlines (cached daily)",
             "GET /health": "Health check"
         }
@@ -181,10 +258,16 @@ def health_check():
 @app.get("/daily-news")
 def get_daily_news():
     """
-    Get top 10 global news headlines
+    Get top 10 global news with FULL unbiased multi-perspective analysis
     
-    Returns cached data from today. Cache is updated once per day on server startup.
-    This endpoint does NOT make new API calls - it serves cached data only.
+    Returns cached data from today. Each story includes:
+    - Complete analysis with perspectives from both sides
+    - Bias scores and indicators
+    - Sources and supporting information
+    - Common facts vs disagreements
+    
+    Cache is updated once per day on server startup (takes ~5-10 minutes).
+    This endpoint is INSTANT - serves fully analyzed cached data only.
     """
     cache = load_daily_news()
     
@@ -203,6 +286,83 @@ def get_daily_news():
         )
     
     return cache
+
+
+@app.post("/search", response_model=SearchResponse)
+async def search_topic(request: SearchRequest):
+    """
+    Search for news headlines about any topic (FAST - just headlines)
+    
+    - **topic**: Any news topic to search (e.g., "climate change", "AI regulation")
+    
+    Returns list of headlines. Click on a headline to get full unbiased analysis via /analyze.
+    
+    This endpoint is FAST (1-2 seconds) and uses minimal API calls.
+    For full multi-perspective analysis, use the returned headline with /analyze endpoint.
+    """
+    
+    if agent is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Agent not initialized. Please set GEMINI_API_KEY and TAVILY_API_KEY environment variables."
+        )
+    
+    try:
+        # Use Tavily search to get headlines about the topic
+        from langchain_tavily import TavilySearch
+        
+        tavily_key = os.getenv("TAVILY_API_KEY")
+        search = TavilySearch(api_key=tavily_key, max_results=10)
+        
+        print(f"🔍 Searching for: {request.topic}...")
+        results = await search.ainvoke(f"latest news about {request.topic}")
+        
+        # Parse results into headlines
+        headlines = []
+        
+        # Tavily returns a dict with 'results' key containing list of articles
+        if isinstance(results, dict) and 'results' in results:
+            for item in results['results']:
+                if isinstance(item, dict):
+                    headlines.append({
+                        "headline": item.get('title', '').strip(),
+                        "source": item.get('url', '').split('/')[2] if item.get('url') else 'Unknown',
+                        "url": item.get('url', '')
+                    })
+        elif isinstance(results, list):
+            # Fallback: if it's a list directly
+            for item in results:
+                if isinstance(item, dict):
+                    headlines.append({
+                        "headline": item.get('title', item.get('content', '')[:100]),
+                        "source": item.get('source', 'Unknown'),
+                        "url": item.get('url', '')
+                    })
+        elif isinstance(results, str):
+            # Parse string response
+            lines = results.split('\n')
+            for line in lines[:10]:
+                if line.strip():
+                    headlines.append({
+                        "headline": line.strip(),
+                        "source": "News",
+                        "url": ""
+                    })
+        
+        print(f"✅ Found {len(headlines)} headlines")
+        
+        return SearchResponse(
+            topic=request.topic,
+            searched_at=datetime.now().isoformat(),
+            count=len(headlines),
+            headlines=headlines
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error searching for topic '{request.topic}': {str(e)}"
+        )
 
 
 @app.post("/analyze", response_model=NewsAnalysis)
