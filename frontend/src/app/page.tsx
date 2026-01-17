@@ -1,6 +1,7 @@
 'use client';
 
 import Globe from '@/components/Globe';
+import TrendingNews from '@/components/TrendingNews';
 import { useEffect, useRef } from 'react';
 
 export default function Home() {
@@ -40,6 +41,9 @@ export default function Home() {
         <p className="text-gray-300 text-sm mt-2">Global News Network • Amplify the Silenced • Question the Powerful</p>
       </div>
 
+      {/* Trending News Sidebar */}
+      <TrendingNews />
+
       {/* Globe Component */}
       <div className="absolute inset-0 z-10">
         <Globe />
@@ -66,13 +70,6 @@ export default function Home() {
             <span>Growing Cities (100K+)</span>
           </div>
         </div>
-      </div>
-
-      {/* Info Overlay - Bottom Left */}
-      <div className="absolute bottom-6 left-6 z-30 bg-black/75 backdrop-blur-sm rounded-lg p-4 text-white text-xs max-w-sm border border-blue-600/30">
-        <p className="text-gray-300 leading-relaxed">
-          📍 Explore global news hubs. Larger dots indicate cities with more journalistic activity and news coverage.
-        </p>
       </div>
     </main>
   );

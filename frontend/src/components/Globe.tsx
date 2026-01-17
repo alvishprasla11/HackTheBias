@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 
 export default function GlobeComponent() {
   const globeRef = useRef<any>(null);
@@ -8,15 +8,15 @@ export default function GlobeComponent() {
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Function to pause rotation on user interaction
-  const pauseRotation = () => {
+  // Function to pause rotation on user interaction (optimized with useCallback)
+  const pauseRotation = useCallback(() => {
     if (globeRef.current && globeRef.current.controls()) {
       globeRef.current.controls().autoRotate = false;
     }
-  };
+  }, []);
 
-  // Function to resume rotation after inactivity
-  const resumeRotationAfterDelay = () => {
+  // Function to resume rotation after inactivity (optimized with useCallback)
+  const resumeRotationAfterDelay = useCallback(() => {
     // Clear any existing timer
     if (inactivityTimerRef.current) {
       clearTimeout(inactivityTimerRef.current);
@@ -28,10 +28,10 @@ export default function GlobeComponent() {
         globeRef.current.controls().autoRotate = true;
       }
     }, 2500); // 2.5 seconds
-  };
+  }, []);
 
-  // Function to send location data to backend
-  const sendLocationToBackend = async (location: any) => {
+  // Function to send location data to backend (optimized with useCallback)
+  const sendLocationToBackend = useCallback(async (location: any) => {
     try {
       const locationData = {
         name: location.properties.name,
@@ -60,7 +60,7 @@ export default function GlobeComponent() {
     } catch (error) {
       console.error('Error sending location to backend:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -82,8 +82,31 @@ export default function GlobeComponent() {
               const minPopulation = 500000; // Increased threshold for better performance
               const filteredPlaces = places.features
                 .filter((p: any) => (p.properties.pop_max || 0) >= minPopulation)
+                .filter((p: any) => p.properties.name !== 'Philadelphia') // Remove Philadelphia
+                .filter((p: any) => !p.properties.name.includes('saka')) // Remove malformed Osaka
                 .sort((a: any, b: any) => (b.properties.pop_max || 0) - (a.properties.pop_max || 0))
-                .slice(0, 80); // Reduced to 80 cities for memory optimization
+                .slice(0, 60); // Reduced to 60 cities for better performance
+
+              // Add custom North American West Coast cities + Calgary
+              const customCities = [
+                { name: 'Seattle', lat: 47.6062, lng: -122.3321, pop_max: 3433000, country: 'United States' },
+                { name: 'Portland', lat: 45.5152, lng: -122.6784, pop_max: 2478000, country: 'United States' },
+                { name: 'San Francisco', lat: 37.7749, lng: -122.4194, pop_max: 4729000, country: 'United States' },
+                { name: 'San Diego', lat: 32.7157, lng: -117.1611, pop_max: 3300000, country: 'United States' },
+                { name: 'Los Angeles', lat: 34.0522, lng: -118.2437, pop_max: 12458000, country: 'United States' },
+                { name: 'Las Vegas', lat: 36.1699, lng: -115.1398, pop_max: 2228000, country: 'United States' },
+                { name: 'Calgary', lat: 51.0447, lng: -114.0719, pop_max: 1336000, country: 'Canada' },
+                { name: 'Minneapolis', lat: 44.9778, lng: -93.2650, pop_max: 2977000, country: 'United States' },
+                { name: 'Vancouver', lat: 49.2827, lng: -123.1207, pop_max: 2463000, country: 'Canada' },
+                { name: 'Osaka', lat: 34.6937, lng: 135.5023, pop_max: 19281000, country: 'Japan' },
+              ].map(city => ({
+                type: 'Feature',
+                geometry: { type: 'Point', coordinates: [city.lng, city.lat] },
+                properties: { name: city.name, pop_max: city.pop_max, adm0name: city.country }
+              }));
+
+              // Combine filtered places with custom cities
+              const allCities = [...filteredPlaces, ...customCities];
 
               // Initialize globe.gl with optimized settings
               const globe = new Globe(mountRef.current!)
@@ -93,7 +116,7 @@ export default function GlobeComponent() {
                 .backgroundImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png')
 
                 // Points Data (The Dots) - Always visible
-                .pointsData(filteredPlaces)
+                .pointsData(allCities)
                 .pointLat((d: any) => d.geometry.coordinates[1])
                 .pointLng((d: any) => d.geometry.coordinates[0])
                 .pointColor(() => '#ffcc00')
@@ -101,11 +124,11 @@ export default function GlobeComponent() {
                 .pointRadius(0.25)
 
                 // Labels Data - Google Maps style (only visible when zoomed in)
-                .labelsData(filteredPlaces)
+                .labelsData(allCities)
                 .labelLat((d: any) => d.geometry.coordinates[1])
                 .labelLng((d: any) => d.geometry.coordinates[0])
                 .labelText((d: any) => d.properties.name)
-                .labelSize(1.5) // Larger base size for readability
+                .labelSize(1.0) // Fixed size
                 .labelDotRadius(0)
                 .labelColor(() => 'rgba(255, 255, 255, 0.95)')
                 .labelResolution(3) // Higher resolution for crisp text
@@ -113,14 +136,14 @@ export default function GlobeComponent() {
 
                 // Google Maps-style zoom behavior
                 .onZoom(({ altitude }: { altitude: number }) => {
-                  // Google Maps style: labels only appear when zoomed in
+                  // Real map behavior: labels maintain constant screen size
                   // altitude: ~2.5 (far) -> 0.1 (close)
 
                   // Show labels only when altitude < 1.5 (zoomed in)
                   if (altitude < 1.5) {
-                    // The closer we are, the larger the label
-                    // Inverse relationship: lower altitude = larger labels
-                    const labelSize = Math.max(1.0, (1.5 - altitude) * 2);
+                    // Keep label size constant - like real maps
+                    // Labels don't grow when you zoom in because you're already closer
+                    const labelSize = 1.0;
                     const pointRadius = 0.3;
 
                     globe.labelSize(labelSize);
