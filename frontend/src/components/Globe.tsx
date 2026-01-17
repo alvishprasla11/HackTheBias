@@ -6,9 +6,10 @@ import AnalysisView from './AnalysisView';
 
 interface GlobeComponentProps {
   isTrendingExpanded?: boolean;
+  onGlobeInteraction?: () => void;
 }
 
-export default function GlobeComponent({ isTrendingExpanded = false }: GlobeComponentProps) {
+export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInteraction }: GlobeComponentProps) {
   const globeRef = useRef<any>(null);
   const mountRef = useRef<HTMLDivElement>(null);
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
@@ -148,6 +149,9 @@ export default function GlobeComponent({ isTrendingExpanded = false }: GlobeComp
 
                 // Click handlers - send to backend and zoom
                 .onPointClick((point: any) => {
+                  // Close TOP 10 NEWS if open
+                  onGlobeInteraction?.();
+                  
                   // Send to backend
                   sendLocationToBackend(point);
 
@@ -170,6 +174,7 @@ export default function GlobeComponent({ isTrendingExpanded = false }: GlobeComp
               // Add event listeners for user interaction
               const controls = globe.controls();
 
+                onGlobeInteraction?.(); // Close TOP 10 NEWS on any interaction
               // When user starts interacting (mouse down, drag, zoom)
               controls.addEventListener('start', () => {
                 pauseRotation();

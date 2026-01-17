@@ -121,39 +121,48 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md overflow-y-auto">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-xl border-b border-yellow-600/30 p-6">
-        <div className="max-w-6xl mx-auto flex justify-between items-start">
-          <div className="flex-1">
-            <h1 
-              className="text-2xl font-bold text-yellow-500 tracking-wider mb-2"
-              style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '2px' }}
-            >
-              UNBIASED ANALYSIS
-            </h1>
-            {analysis && (
-              <p 
-                className="text-sm text-gray-400"
-                style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.5px' }}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ paddingTop: '120px' }}>
+      {/* Backdrop - Semi-transparent to show globe */}
+      <div 
+        className="absolute inset-0 bg-black/40" 
+        onClick={onClose}
+      />
+      
+      {/* Modal Content */}
+      <div className="relative bg-black border border-yellow-600/30 rounded-lg max-w-5xl w-full max-h-[calc(100vh-140px)] overflow-hidden shadow-2xl">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-black border-b border-yellow-600/30 p-4">
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <h1 
+                className="text-xl font-bold text-yellow-500 tracking-wider mb-1"
+                style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '2px' }}
               >
-                {analysis.location} • {analysis.topic}
-              </p>
-            )}
-          </div>
-          <button
-            onClick={onClose}
-            className="px-6 py-2 bg-black/40 border border-yellow-600/30 rounded-full
-                     text-yellow-500 hover:bg-yellow-600/10 hover:border-yellow-600/60
-                     transition-all duration-300"
-            style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '1px' }}
-          >
+                UNBIASED ANALYSIS
+              </h1>
+              {analysis && (
+                <p 
+                  className="text-xs text-gray-400"
+                  style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.5px' }}
+                >
+                  {analysis.location} • {analysis.topic}
+                </p>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              className="px-4 py-1.5 bg-black/40 border border-yellow-600/30 rounded
+                       text-yellow-500 hover:bg-yellow-600/10 hover:border-yellow-600/60
+                       transition-all duration-300 text-sm"
+              style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '1px' }}
+            >
             CLOSE
           </button>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto p-6">
+      {/* Scrollable Content */}
+      <div className="overflow-y-auto max-h-[calc(100vh-220px)] p-6">
         {/* Loading State */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-20">
@@ -229,7 +238,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                 MULTIPLE PERSPECTIVES
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {analysis.perspectives.map((perspective, index) => (
+                {analysis.perspectives?.map((perspective, index) => (
                   <div 
                     key={index}
                     className="bg-black/40 border border-yellow-600/30 rounded-lg p-6 space-y-4"
@@ -277,7 +286,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                           KEY CLAIMS:
                         </p>
                         <ul className="space-y-1">
-                          {perspective.key_claims.map((claim, i) => (
+                          {perspective.key_claims?.map((claim, i) => (
                             <li 
                               key={i}
                               className="text-xs text-gray-400 pl-4"
@@ -300,7 +309,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                           SOURCES:
                         </p>
                         <div className="space-y-2">
-                          {perspective.sources.map((source, i) => (
+                          {perspective.sources?.map((source, i) => (
                             <a
                               key={i}
                               href={source.url}
@@ -362,7 +371,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                           BIAS INDICATORS:
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {perspective.bias_indicators.map((indicator, i) => (
+                          {perspective.bias_indicators?.map((indicator, i) => (
                             <span
                               key={i}
                               className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded"
@@ -398,7 +407,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
             </div>
 
             {/* Common Facts */}
-            {analysis.common_facts.length > 0 && (
+            {analysis.common_facts?.length > 0 && (
               <div className="bg-black/40 border border-green-600/30 rounded-lg p-6">
                 <h3 
                   className="text-sm text-green-500 mb-3 tracking-wider"
@@ -407,7 +416,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                   COMMON GROUND (AGREED FACTS)
                 </h3>
                 <ul className="space-y-2">
-                  {analysis.common_facts.map((fact, i) => (
+                  {analysis.common_facts?.map((fact, i) => (
                     <li 
                       key={i}
                       className="text-sm text-gray-300 pl-4"
@@ -430,7 +439,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                   KEY DISAGREEMENTS
                 </h3>
                 <ul className="space-y-2">
-                  {analysis.key_disagreements.map((disagreement, i) => (
+                  {analysis.key_disagreements?.map((disagreement, i) => (
                     <li 
                       key={i}
                       className="text-sm text-gray-300 pl-4"
@@ -453,7 +462,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                   INDEPENDENT VOICES
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {analysis.social_media_voices.map((voice, i) => (
+                  {analysis.social_media_voices?.map((voice, i) => (
                     <a
                       key={i}
                       href={voice.url !== 'N/A_Social_Media_Trend' ? voice.url : '#'}
@@ -492,7 +501,13 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                           className="text-[10px] text-gray-600 group-hover:text-gray-500 transition-colors block mt-1"
                           style={{ fontFamily: 'monospace, Courier New, Courier' }}
                         >
-                          {new URL(voice.url).hostname.replace('www.', '')}
+                          {(() => {
+                            try {
+                              return new URL(voice.url).hostname.replace('www.', '');
+                            } catch {
+                              return voice.url;
+                            }
+                          })()}
                         </span>
                       )}
                     </a>
@@ -518,6 +533,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

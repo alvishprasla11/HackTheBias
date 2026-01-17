@@ -29,9 +29,10 @@ interface DailyNewsResponse {
 interface TrendingNewsProps {
   onAnalyze?: (analysis: any) => void;
   onExpandChange?: (isExpanded: boolean) => void;
+  forceCollapse?: number;
 }
 
-export default function TrendingNews({ onAnalyze, onExpandChange }: TrendingNewsProps) {
+export default function TrendingNews({ onAnalyze, onExpandChange, forceCollapse }: TrendingNewsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +42,13 @@ export default function TrendingNews({ onAnalyze, onExpandChange }: TrendingNews
   useEffect(() => {
     onExpandChange?.(isExpanded);
   }, [isExpanded, onExpandChange]);
+
+  // Collapse when parent requests
+  useEffect(() => {
+    if (forceCollapse) {
+      setIsExpanded(false);
+    }
+  }, [forceCollapse]);
 
   // Fetch daily news from backend
   useEffect(() => {
