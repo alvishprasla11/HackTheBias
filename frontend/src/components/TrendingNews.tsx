@@ -28,13 +28,19 @@ interface DailyNewsResponse {
 
 interface TrendingNewsProps {
   onAnalyze?: (analysis: any) => void;
+  onExpandChange?: (isExpanded: boolean) => void;
 }
 
-export default function TrendingNews({ onAnalyze }: TrendingNewsProps) {
+export default function TrendingNews({ onAnalyze, onExpandChange }: TrendingNewsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Notify parent when expanded state changes
+  useEffect(() => {
+    onExpandChange?.(isExpanded);
+  }, [isExpanded, onExpandChange]);
 
   // Fetch daily news from backend
   useEffect(() => {

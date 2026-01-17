@@ -263,11 +263,12 @@ def get_daily_news():
     Returns cached data from today. Each story includes:
     - Complete analysis with perspectives from both sides
     - Bias scores and indicators
-    - Sources and supporting information
+    - Sources with article URLs and supporting information
     - Common facts vs disagreements
     
     Cache is updated once per day on server startup (takes ~5-10 minutes).
     This endpoint is INSTANT - serves fully analyzed cached data only.
+    All NewsSource objects include article URLs for verification.
     """
     cache = load_daily_news()
     
@@ -375,10 +376,12 @@ async def analyze_news(request: AnalysisRequest):
     
     Returns comprehensive analysis with:
     - Multiple perspectives (typically opposing viewpoints)
-    - Source information and bias indicators
+    - Source information with article URLs and bias indicators
     - Who supports each perspective
     - Common facts vs disagreements
-    - Social media and independent voices
+    - Social media and independent voices with links
+    
+    All NewsSource objects include the article URL for verification.
     """
     
     if agent is None:

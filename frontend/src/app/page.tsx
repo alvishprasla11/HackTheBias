@@ -11,6 +11,7 @@ export default function Home() {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [analysisTopic, setAnalysisTopic] = useState<string | null>(null);
+  const [isTrendingExpanded, setIsTrendingExpanded] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -75,11 +76,11 @@ export default function Home() {
       </div>
 
       {/* Trending News Sidebar */}
-      <TrendingNews onAnalyze={handleTrendingAnalyze} />
+      <TrendingNews onAnalyze={handleTrendingAnalyze} onExpandChange={setIsTrendingExpanded} />
 
       {/* Globe Component */}
       <div className="absolute inset-0 z-10">
-        <Globe />
+        <Globe isTrendingExpanded={isTrendingExpanded} />
       </div>
 
       {/* Legend Overlay - Bottom Right */}

@@ -83,6 +83,7 @@ WORKFLOW - Follow these steps in order:
 3. RESEARCH EACH PERSPECTIVE (do this for BOTH perspectives):
    For each perspective, search and find:
    - At least 3-5 news sources representing this view
+   - **IMPORTANT: For each source, include the full article URL**
    - Their main arguments and key claims
    - Who supports/funds these sources (political parties, corporations, governments)
    - Media ownership information
@@ -93,6 +94,7 @@ WORKFLOW - Follow these steps in order:
    - Search for independent journalists and social media voices
    - Look for citizen journalists, grassroots media, non-mainstream perspectives
    - Include platforms like Twitter/X, TikTok, YouTube, Instagram
+   - **IMPORTANT: Include URLs for all sources**
 
 5. COMPARE AND SYNTHESIZE:
    - Identify facts that all sides agree on (common ground)
@@ -165,9 +167,9 @@ class NewsAnalysisAgent:
         
         # Prepare the query for the agent
         if topic:
-            query = f"Analyze the news story about '{topic}' in {location}. Provide a complete multi-perspective analysis."
+            query = f"Analyze the news story about '{topic}' in {location}. Provide a complete multi-perspective analysis. IMPORTANT: Include the full article URL for every news source you cite."
         else:
-            query = f"Find the biggest current news story in {location} and provide a complete multi-perspective analysis."
+            query = f"Find the biggest current news story in {location} and provide a complete multi-perspective analysis. IMPORTANT: Include the full article URL for every news source you cite."
         
         print(f"\n{'='*80}")
         print(f"🔍 Analyzing news in {location}...")
@@ -190,7 +192,7 @@ class NewsAnalysisAgent:
         
         # Parse into structured format with a single LLM call
         analysis = await self.structured_model.ainvoke([
-            {"role": "system", "content": "You are a data structuring assistant. Convert the news analysis into the required NewsAnalysis format. Be accurate and preserve all information."},
+            {"role": "system", "content": "You are a data structuring assistant. Convert the news analysis into the required NewsAnalysis format. Be accurate and preserve all information. CRITICAL: Ensure all NewsSource objects include their full article URLs - do not omit or leave URLs empty."},
             {"role": "user", "content": f"Location: {location}\n\nAnalysis:\n{research_output}"}
         ])
         

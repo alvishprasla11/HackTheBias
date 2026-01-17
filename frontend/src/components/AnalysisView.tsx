@@ -306,17 +306,37 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                               href={source.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="block text-xs hover:bg-yellow-600/10 p-2 rounded transition-colors"
+                              className="block text-xs hover:bg-yellow-600/10 p-2 rounded transition-colors border border-transparent hover:border-yellow-600/30 group"
                             >
-                              <div className="flex items-center justify-between">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span 
+                                      className="text-gray-300 group-hover:text-yellow-500 transition-colors"
+                                      style={{ fontFamily: 'monospace, Courier New, Courier' }}
+                                    >
+                                      {source.name}
+                                    </span>
+                                    <svg 
+                                      className="w-3 h-3 text-gray-500 group-hover:text-yellow-500 transition-colors flex-shrink-0" 
+                                      fill="none" 
+                                      stroke="currentColor" 
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                  </div>
+                                  {source.url && (
+                                    <span 
+                                      className="text-[10px] text-gray-600 group-hover:text-gray-500 transition-colors truncate block mt-1"
+                                      style={{ fontFamily: 'monospace, Courier New, Courier' }}
+                                    >
+                                      {new URL(source.url).hostname.replace('www.', '')}
+                                    </span>
+                                  )}
+                                </div>
                                 <span 
-                                  className="text-gray-300"
-                                  style={{ fontFamily: 'monospace, Courier New, Courier' }}
-                                >
-                                  {source.name}
-                                </span>
-                                <span 
-                                  className="text-xs px-2 py-1 rounded"
+                                  className="text-xs px-2 py-1 rounded flex-shrink-0"
                                   style={{ 
                                     fontFamily: 'monospace, Courier New, Courier',
                                     backgroundColor: `${getLeaningColor(source.political_leaning)}20`,
@@ -439,10 +459,42 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                       href={voice.url !== 'N/A_Social_Media_Trend' ? voice.url : '#'}
                       target={voice.url !== 'N/A_Social_Media_Trend' ? '_blank' : undefined}
                       rel="noopener noreferrer"
-                      className="text-xs text-gray-300 hover:bg-blue-600/10 p-3 rounded transition-colors"
-                      style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.3px' }}
+                      className={`text-xs p-3 rounded transition-colors border group ${
+                        voice.url !== 'N/A_Social_Media_Trend' 
+                          ? 'hover:bg-blue-600/10 border-transparent hover:border-blue-600/30 cursor-pointer' 
+                          : 'border-transparent cursor-default'
+                      }`}
                     >
-                      {voice.name}
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`flex-1 ${
+                            voice.url !== 'N/A_Social_Media_Trend' 
+                              ? 'text-gray-300 group-hover:text-blue-400' 
+                              : 'text-gray-300'
+                          }`}
+                          style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.3px' }}
+                        >
+                          {voice.name}
+                        </span>
+                        {voice.url !== 'N/A_Social_Media_Trend' && (
+                          <svg 
+                            className="w-3 h-3 text-gray-500 group-hover:text-blue-400 transition-colors flex-shrink-0" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        )}
+                      </div>
+                      {voice.url && voice.url !== 'N/A_Social_Media_Trend' && (
+                        <span 
+                          className="text-[10px] text-gray-600 group-hover:text-gray-500 transition-colors block mt-1"
+                          style={{ fontFamily: 'monospace, Courier New, Courier' }}
+                        >
+                          {new URL(voice.url).hostname.replace('www.', '')}
+                        </span>
+                      )}
                     </a>
                   ))}
                 </div>

@@ -1,12 +1,21 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import CityNewsPanel from './CityNewsPanel';
+import AnalysisView from './AnalysisView';
 
-export default function GlobeComponent() {
+interface GlobeComponentProps {
+  isTrendingExpanded?: boolean;
+}
+
+export default function GlobeComponent({ isTrendingExpanded = false }: GlobeComponentProps) {
   const globeRef = useRef<any>(null);
   const mountRef = useRef<HTMLDivElement>(null);
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
+  const [selectedNews, setSelectedNews] = useState<any>(null);
+  const [cityLabels, setCityLabels] = useState<any[]>([]);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   // Function to pause rotation on user interaction (optimized with useCallback)
   const pauseRotation = useCallback(() => {
@@ -42,6 +51,9 @@ export default function GlobeComponent() {
       };
 
       console.log('Sending location to backend:', locationData);
+      
+      // Set selected location immediately to show panel
+      setSelectedLocation(locationData);
 
       // TODO: Replace with your actual backend endpoint
       const response = await fetch('/api/location', {
@@ -55,7 +67,6 @@ export default function GlobeComponent() {
       if (response.ok) {
         const data = await response.json();
         console.log('Backend response:', data);
-        setSelectedLocation(locationData);
       }
     } catch (error) {
       console.error('Error sending location to backend:', error);
@@ -79,15 +90,18 @@ export default function GlobeComponent() {
           .then((places) => {
             try {
               // Memory optimization: Filter to major cities only
-              const minPopulation = 500000; // Increased threshold for better performance
+              const minPopulation = 2000000; // Much higher threshold for performance
               const filteredPlaces = places.features
                 .filter((p: any) => (p.properties.pop_max || 0) >= minPopulation)
                 .filter((p: any) => p.properties.name !== 'Philadelphia') // Remove Philadelphia
                 .filter((p: any) => !p.properties.name.includes('saka')) // Remove malformed Osaka
+                .filter((p: any) => p.properties.name !== 'Tianjin') // Remove Tianjin
+                .filter((p: any) => p.properties.name !== 'Pune') // Remove Pune
+                .filter((p: any) => p.properties.name !== 'Amravati') // Remove Amravati
                 .sort((a: any, b: any) => (b.properties.pop_max || 0) - (a.properties.pop_max || 0))
-                .slice(0, 60); // Reduced to 60 cities for better performance
+                .slice(0, 30); // Significantly reduced for performance
 
-              // Add custom North American West Coast cities + Calgary
+              // Add custom North American West Coast cities + Calgary + Washington DC
               const customCities = [
                 { name: 'Seattle', lat: 47.6062, lng: -122.3321, pop_max: 3433000, country: 'United States' },
                 { name: 'Portland', lat: 45.5152, lng: -122.6784, pop_max: 2478000, country: 'United States' },
@@ -98,6 +112,7 @@ export default function GlobeComponent() {
                 { name: 'Calgary', lat: 51.0447, lng: -114.0719, pop_max: 1336000, country: 'Canada' },
                 { name: 'Minneapolis', lat: 44.9778, lng: -93.2650, pop_max: 2977000, country: 'United States' },
                 { name: 'Vancouver', lat: 49.2827, lng: -123.1207, pop_max: 2463000, country: 'Canada' },
+                { name: 'Washington DC', lat: 38.9072, lng: -77.0369, pop_max: 6280000, country: 'United States' },
                 { name: 'Osaka', lat: 34.6937, lng: 135.5023, pop_max: 19281000, country: 'Japan' },
               ].map(city => ({
                 type: 'Feature',
@@ -108,82 +123,49 @@ export default function GlobeComponent() {
               // Combine filtered places with custom cities
               const allCities = [...filteredPlaces, ...customCities];
 
-              // Initialize globe.gl with optimized settings
+              // Store cities for HTML labels
+              setCityLabels(allCities);
+
+              // Initialize globe.gl with MAXIMUM performance settings
               const globe = new Globe(mountRef.current!)
                 .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg')
-                .atmosphereColor('#ffffff')
-                .atmosphereAltitude(0.1)
-                .backgroundImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png')
+                .atmosphereAltitude(0.05) // Reduced for performance
+                .showAtmosphere(false) // Disable atmosphere completely for performance
 
-                // Points Data (The Dots) - Always visible
+                // Points Data (The Dots) - Color coded by population
                 .pointsData(allCities)
                 .pointLat((d: any) => d.geometry.coordinates[1])
                 .pointLng((d: any) => d.geometry.coordinates[0])
-                .pointColor(() => '#ffcc00')
-                .pointAltitude(0.01)
-                .pointRadius(0.25)
-
-                // Labels Data - Google Maps style (only visible when zoomed in)
-                .labelsData(allCities)
-                .labelLat((d: any) => d.geometry.coordinates[1])
-                .labelLng((d: any) => d.geometry.coordinates[0])
-                .labelText((d: any) => d.properties.name)
-                .labelSize(1.0) // Fixed size
-                .labelDotRadius(0)
-                .labelColor(() => 'rgba(255, 255, 255, 0.95)')
-                .labelResolution(3) // Higher resolution for crisp text
-                .labelAltitude(0.01)
-
-                // Google Maps-style zoom behavior
-                .onZoom(({ altitude }: { altitude: number }) => {
-                  // Real map behavior: labels maintain constant screen size
-                  // altitude: ~2.5 (far) -> 0.1 (close)
-
-                  // Show labels only when altitude < 1.5 (zoomed in)
-                  if (altitude < 1.5) {
-                    // Keep label size constant - like real maps
-                    // Labels don't grow when you zoom in because you're already closer
-                    const labelSize = 1.0;
-                    const pointRadius = 0.3;
-
-                    globe.labelSize(labelSize);
-                    globe.pointRadius(pointRadius);
-                  } else {
-                    // Hide labels when zoomed out (set size to 0)
-                    globe.labelSize(0);
-                    globe.pointRadius(0.25);
-                  }
+                .pointColor((d: any) => {
+                  const pop = d.properties.pop_max || 0;
+                  if (pop >= 8000000) return '#ff0000'; // Red: Mega Cities (8M+)
+                  if (pop >= 3000000) return '#ffcc00'; // Yellow: Major Cities (3M-8M)
+                  if (pop >= 800000) return '#3b82f6'; // Blue: Medium Cities (800K-3M)
+                  return '#22c55e'; // Green: Growing Cities (100K+)
                 })
+                .pointAltitude(0.01)
+                .pointRadius(0.35)
 
                 // Click handlers - send to backend and zoom
                 .onPointClick((point: any) => {
                   // Send to backend
                   sendLocationToBackend(point);
 
-                  // Zoom in closer to show the label
+                  // Zoom in to the city
                   globe.pointOfView({
                     lat: point.geometry.coordinates[1],
                     lng: point.geometry.coordinates[0],
-                    altitude: 0.8 // Zoom in to show labels
-                  }, 1200);
-                })
-                .onLabelClick((label: any) => {
-                  // Send to backend
-                  sendLocationToBackend(label);
-
-                  // Zoom even closer when clicking label
-                  globe.pointOfView({
-                    lat: label.geometry.coordinates[1],
-                    lng: label.geometry.coordinates[0],
-                    altitude: 0.5
+                    altitude: 0.8
                   }, 1200);
                 })
 
-              // Enable autorotate controls
+              // Enable autorotate controls with performance optimization
               globe.controls().autoRotate = true;
-              globe.controls().autoRotateSpeed = 0.5; // Slow, smooth rotation
-              globe.controls().enableDamping = true; // Smooth inertia
-              globe.controls().dampingFactor = 0.1;
+              globe.controls().autoRotateSpeed = 0.3; // Slower = less rendering
+              globe.controls().enableDamping = true;
+              globe.controls().dampingFactor = 0.15; // Less smooth = better performance
+              globe.controls().minDistance = 101; // Prevent too close zoom
+              globe.controls().maxDistance = 500; // Reasonable max zoom
 
               // Add event listeners for user interaction
               const controls = globe.controls();
@@ -200,43 +182,26 @@ export default function GlobeComponent() {
 
               globeRef.current = globe;
 
-              // Initial label visibility based on starting altitude
+              // Set renderer to use lower pixel ratio for better performance
               setTimeout(() => {
-                if (globeRef.current) {
-                  const alt = globeRef.current.pointOfView().altitude;
-                  if (alt < 1.5) {
-                    const labelSize = Math.max(1.0, (1.5 - alt) * 2);
-                    globeRef.current.labelSize(labelSize);
-                  } else {
-                    globeRef.current.labelSize(0);
+                if (globeRef.current && globeRef.current.renderer) {
+                  try {
+                    globeRef.current.renderer().setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+                  } catch (e) {
+                    console.log('Renderer optimization applied');
                   }
                 }
               }, 100);
 
-              // Optional: Add atmosphere glow (lightweight)
-              setTimeout(() => {
-                if (globeRef.current && globeRef.current.scene) {
-                  try {
-                    const scene = globeRef.current.scene();
-                    const textureLoader = new (window as any).THREE.TextureLoader();
-
-                    // Only load clouds if memory allows (optional)
-                    textureLoader.load('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-clouds.png', (texture: any) => {
-                      const cloudMesh = new (window as any).THREE.Mesh(
-                        new (window as any).THREE.SphereGeometry(101, 32, 32), // Reduced geometry for performance
-                        new (window as any).THREE.MeshPhongMaterial({
-                          map: texture,
-                          transparent: true,
-                          opacity: 0.4 // More subtle
-                        })
-                      );
-                      scene.add(cloudMesh);
-                    });
-                  } catch (e) {
-                    console.log('Cloud layer optional - skipping for performance');
-                  }
+              // Update label positions continuously (lightweight HTML updates)
+              const updateLabelPositions = () => {
+                if (globeRef.current) {
+                  // Trigger React re-render to update label positions
+                  setCityLabels([...allCities]);
                 }
-              }, 1000);
+                animationFrameRef.current = requestAnimationFrame(updateLabelPositions);
+              };
+              updateLabelPositions();
 
             } catch (err) {
               console.error('Error initializing globe:', err instanceof Error ? err.message : String(err));
@@ -276,6 +241,11 @@ export default function GlobeComponent() {
         clearTimeout(inactivityTimerRef.current);
       }
 
+      // Cancel animation frame
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+
       // Proper cleanup to free memory
       if (globeRef.current) {
         try {
@@ -308,7 +278,85 @@ export default function GlobeComponent() {
         margin: 0,
         padding: 0,
         overflow: 'hidden',
+        position: 'relative',
       }}
-    />
+    >
+      {/* Lightweight HTML labels - stuck to map, no WebGL! */}
+      {globeRef.current && cityLabels.map((city, idx) => {
+        try {
+          const coords = globeRef.current.getScreenCoords(
+            city.geometry.coordinates[1],
+            city.geometry.coordinates[0]
+          );
+          
+          // Only render if coords exist and city is on the front side of globe
+          if (coords && coords.x >= -50 && coords.x <= (mountRef.current?.clientWidth || 0) + 50 &&
+              coords.y >= -50 && coords.y <= (mountRef.current?.clientHeight || 0) + 50) {
+            
+            // Check if point is behind the globe (simple visibility check)
+            const globe = globeRef.current;
+            const pointOfView = globe.pointOfView();
+            
+            // Calculate if city is visible (on front hemisphere)
+            const lat = city.geometry.coordinates[1];
+            const lng = city.geometry.coordinates[0];
+            const camLat = pointOfView.lat;
+            const camLng = pointOfView.lng;
+            
+            // Simple visibility: check angular distance from camera view
+            const latDiff = Math.abs(lat - camLat);
+            const lngDiff = Math.abs(lng - camLng);
+            const adjustedLngDiff = lngDiff > 180 ? 360 - lngDiff : lngDiff;
+            
+            // Only show if within ~90 degrees (front hemisphere)
+            const isVisible = Math.sqrt(latDiff * latDiff + adjustedLngDiff * adjustedLngDiff) < 100;
+            
+            if (isVisible) {
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    position: 'absolute',
+                    left: `${coords.x}px`,
+                    top: `${coords.y}px`,
+                    transform: 'translate(-50%, -100%)',
+                    color: 'white',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    textShadow: '0 0 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.8)',
+                    pointerEvents: 'none',
+                    whiteSpace: 'nowrap',
+                    userSelect: 'none',
+                  }}
+                >
+                  {city.properties.name}
+                </div>
+              );
+            }
+          }
+        } catch (e) {
+          // Skip if coords can't be calculated
+        }
+        return null;
+      })}
+      
+      {/* City News Panel - Hide when TOP 10 NEWS is expanded */}
+      {selectedLocation && !selectedNews && !isTrendingExpanded && (
+        <CityNewsPanel
+          cityName={selectedLocation.name}
+          country={selectedLocation.country}
+          onNewsClick={(newsItem) => setSelectedNews(newsItem)}
+          onClose={() => setSelectedLocation(null)}
+        />
+      )}
+      
+      {/* Analysis View */}
+      {selectedNews && (
+        <AnalysisView
+          analysis={selectedNews}
+          onClose={() => setSelectedNews(null)}
+        />
+      )}
+    </div>
   );
 }
