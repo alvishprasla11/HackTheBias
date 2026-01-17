@@ -1,8 +1,11 @@
-# HackTheBias - Amplifying Truth, Silencing Power
+# All-in-One Unbiased News Platform
 
-## Overview
+## HackTheBias Hackathon Submission
 
-HackTheBias is a revolutionary all-in-one news platform dedicated to mitigating knowledge bias and cognitive bias while amplifying the silenced voices of independent journalists and oppressed news organizations. Our mission is to cut through the noise created by powerful entities and give you access to authentic, diverse perspectives that challenge dominant narratives and surface the truth that power tries to hide.
+This is our submission for the **HackTheBias Hackathon** - a revolutionary all-in-one news platform dedicated to mitigating knowledge bias and cognitive bias while amplifying the silenced voices of independent journalists and oppressed news organizations. Our mission is to cut through the noise created by powerful entities and give users access to authentic, diverse perspectives that challenge dominant narratives and surface the truth that power tries to hide.
+
+**Hackathon:** HackTheBias  
+**Challenge:** Creating technology solutions that combat information bias and promote truth
 
 ## The Crisis We're Addressing
 
@@ -124,26 +127,44 @@ Unlike mainstream platforms that serve power and profit:
 - **Community ground-truthing** - Local voices verifying or challenging distant reporting
 - **Anti-censorship infrastructure** - Decentralized hosting for outlets facing suppression
 
-## Join the Resistance
+## Hackathon Goals & Impact
 
-HackTheBias isn't a news platform—it's an act of informational resistance.
+**ClearSignal** was created for the **HackTheBias Hackathon** to demonstrate that technology can be a force for informational justice. 
+This platform
+**What This Platform Enables:**
+- **Defund propaganda** by redirecting attention from power-backed outlets to truth-tellers
+- **Support independent journalism** by amplifying marginalized voices
+- **Build cognitive immunity** to manipulation techniques used to control populations  
+- **Challenge knowledge bias** by exposing what powerful institutions suppress
+- **Amplify the silenced** by creating infrastructure for oppressed news organizations
 
-Every time you read here, you're:
-- **Defunding propaganda** by refusing to give clicks to power-backed outlets
-- **Supporting truth-tellers** by directing attention to independent journalists
-- **Building cognitive immunity** to the manipulation techniques used to control populations
-- **Challenging knowledge bias** by learning what powerful institutions don't want taught
-- **Amplifying the silenced** by making space for voices that deserve to be heard
+**Our Hackathon Pitch:**
 
-**We're not here to be neutral. We're here to level the playing field.**
+We're not here to be neutral. We're here to level the playing field.
 
 The powerful already have megaphones. We're building one for everyone else.
 
 ---
 
+## Getting Started
+
+```bash
+# Backend setup
+cd backend
+pip install -r requirements.txt
+python src/main.py
+
+# Frontend setup
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
 *"Amplify the Silenced, Question the Powerful"*
 
-**HackTheBias** - Because truth doesn't come from those who benefit from lies. can't buy their way onto your screentions
+**HackTheBias Hackathon** - Because truth doesn't come from those who benefit from lies. can't buy their way onto your screentions
 - Flags disputed claims and misinformation
 - Provides context for complex issues
 
@@ -163,10 +184,29 @@ The powerful already have megaphones. We're building one for everyone else.
 2. **Story Clustering** - AI identifies articles covering the same event
 3. **Bias Analysis** - Natural language processing detects framing and sentiment
 4. **Presentation** - Stories displayed with multiple perspectives highlighted
-5. **User Control** - Readers choose which perspectives to explore
+This hackathon project leverages:
 
-## Technology Stack
+- **Backend**: Python-based API for news aggregation and analysis (`/backend`)
+- **Frontend**: Modern web interface built with Next.js (`/frontend`)
+- **AI/ML**: Natural language processing for bias detection and clustering
+- **Data**: Real-time news feeds from diverse sources via APIs
 
+## Hackathon Implementation
+
+For the HackTheBias hackathon, we're building a working prototype that demonstrates:
+
+**Phase 1 - Core Features (Hackathon Scope):**
+- Multi-source news aggregation from diverse outlets
+- Basic power analysis showing ownership and funding transparency
+- Side-by-side perspective comparison
+- Initial bias detection using NLP
+- Amplification of independent/marginalized sources
+
+**Phase 2 - Post-Hackathon Expansion:**
+- Advanced cognitive bias mitigation tools
+- Global journalist partnership network
+- Community verification systems
+- Whistleblower protection infrastructure
 - **Backend**: Python-based API for news aggregation and analysis
 - **Frontend**: Modern web interface built with Next.js
 - **AI/ML**: Natural language processing for bias detection and clustering
