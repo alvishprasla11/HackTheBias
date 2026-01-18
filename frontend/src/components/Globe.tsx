@@ -64,9 +64,7 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
       isPanelOpenRef.current = true;
 
       // Backend location tracking - currently not implemented
-      // TODO: Implement backend endpoint if location tracking is needed
-      /*
-      
+      // If needed in the future, implement backend endpoint for location tracking
     } catch (error) {
       console.error('Error sending location to backend:', error);
     }
