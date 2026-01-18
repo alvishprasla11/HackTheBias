@@ -103,6 +103,9 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
               // Add custom cities for better global coverage
               const customCities = [
                 // North America
+                { name: 'Toronto', lat: 43.6532, lng: -79.3832, pop_max: 6197000, country: 'Canada' },
+                { name: 'Montreal', lat: 45.5017, lng: -73.5673, pop_max: 4221000, country: 'Canada' },
+                { name: 'Halifax', lat: 44.6488, lng: -63.5752, pop_max: 431000, country: 'Canada' },
                 { name: 'Seattle', lat: 47.6062, lng: -122.3321, pop_max: 3433000, country: 'United States' },
                 { name: 'Portland', lat: 45.5152, lng: -122.6784, pop_max: 2478000, country: 'United States' },
                 { name: 'San Francisco', lat: 37.7749, lng: -122.4194, pop_max: 4729000, country: 'United States' },
