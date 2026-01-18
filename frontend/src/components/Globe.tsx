@@ -338,11 +338,14 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
 
               globeRef.current = globe;
 
-              // Set renderer to use lower pixel ratio for better performance
+              // Set renderer to use lower pixel ratio for better performance and transparent background
               setTimeout(() => {
                 if (globeRef.current && globeRef.current.renderer) {
                   try {
-                    globeRef.current.renderer().setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+                    const renderer = globeRef.current.renderer();
+                    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+                    // Make background transparent so stars show through
+                    renderer.setClearColor(0x000000, 0);
                   } catch (e) {
                     console.log('Renderer optimization applied');
                   }
@@ -444,6 +447,7 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
         padding: 0,
         overflow: 'hidden',
         position: 'relative',
+        background: 'transparent',
       }}
     >
       {/* Lightweight HTML labels - stuck to map, no WebGL! */}

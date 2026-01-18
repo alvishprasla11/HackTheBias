@@ -103,5 +103,110 @@
         "url": "https://www.cfr.org/global-conflict-tracker/conflict/violence-democratic-republic-congo"
       }
     ]
+  },
+  "karachi pakistan": {
+    "date": "2026-01-17",
+    "headlines": [
+      {
+        "headline": "Karachi - latest news, breaking stories and comment",
+        "source": "www.the-independent.com",
+        "url": "https://www.the-independent.com/topic/karachi"
+      },
+      {
+        "headline": "Geo News: Latest News Breaking, Live Videos, World ...",
+        "source": "www.geo.tv",
+        "url": "https://www.geo.tv/"
+      },
+      {
+        "headline": "Terrible Fire Breaks Out in Gul Plaza on MA Jinnah Road - YouTube",
+        "source": "www.youtube.com",
+        "url": "https://www.youtube.com/watch?v=xJ5E3QKXY2o"
+      },
+      {
+        "headline": "Karachi Gul Plaza Shopping Mall Fire Worsens - YouTube",
+        "source": "www.youtube.com",
+        "url": "https://www.youtube.com/watch?v=Rp9_ImmdNeU"
+      },
+      {
+        "headline": "City 21 - YouTube",
+        "source": "www.youtube.com",
+        "url": "https://www.youtube.com/channel/UCB-8E662xOk1I3-wdhTMNiw"
+      },
+      {
+        "headline": "A huge fire tore through the Gul Plaza mall in Karachi, Pakistan ...",
+        "source": "www.instagram.com",
+        "url": "https://www.instagram.com/reel/DToVsXmj2h5/"
+      },
+      {
+        "headline": "Home - DAWN.COM",
+        "source": "www.dawn.com",
+        "url": "https://www.dawn.com/"
+      },
+      {
+        "headline": "Pakistan | Today's latest from Al Jazeera",
+        "source": "www.aljazeera.com",
+        "url": "https://www.aljazeera.com/where/pakistan/"
+      },
+      {
+        "headline": "Massive fire engulfs dozens of shops at a shopping mall in southern ...",
+        "source": "www.king5.com",
+        "url": "https://www.king5.com/article/syndication/associatedpress/massive-fire-engulfs-dozens-of-shops-at-a-shopping-mall-in-southern-pakistan-killing-3-people/616-4cc58c83-e74c-43cf-8ca5-3c75025b4121"
+      }
+    ]
+  },
+  "istanbul turkey": {
+    "date": "2026-01-17",
+    "headlines": [
+      {
+        "headline": "Istanbul Live News - NewsNow",
+        "source": "www.newsnow.com",
+        "url": "https://www.newsnow.com/us/World/Middle+East/Turkey/Istanbul"
+      },
+      {
+        "headline": "Istanbul - latest news, breaking stories and comment",
+        "source": "www.the-independent.com",
+        "url": "https://www.the-independent.com/topic/istanbul"
+      },
+      {
+        "headline": "Daily Sabah | Latest & Breaking News from Turkey | Istanbul",
+        "source": "www.dailysabah.com",
+        "url": "https://www.dailysabah.com/"
+      },
+      {
+        "headline": "Istanbul | PBS News",
+        "source": "www.pbs.org",
+        "url": "https://www.pbs.org/newshour/tag/istanbul"
+      },
+      {
+        "headline": "Istanbul - AP News",
+        "source": "apnews.com",
+        "url": "https://apnews.com/hub/istanbul"
+      },
+      {
+        "headline": "Turkey | Today's latest from Al Jazeera",
+        "source": "www.aljazeera.com",
+        "url": "https://www.aljazeera.com/where/turkey/"
+      },
+      {
+        "headline": "Istanbul - BBC News",
+        "source": "www.bbc.com",
+        "url": "https://www.bbc.com/news/topics/cxw7q5dkxj6t"
+      },
+      {
+        "headline": "T\u00fcrkiye Today | Breaking, Exclusive Content from Turkey & Region",
+        "source": "www.turkiyetoday.com",
+        "url": "https://www.turkiyetoday.com/"
+      },
+      {
+        "headline": "Turkish News - Latest News from Turkey - H\u00fcrriyet Daily News",
+        "source": "www.hurriyetdailynews.com",
+        "url": "https://www.hurriyetdailynews.com/"
+      },
+      {
+        "headline": "TRT World - Breaking News, Live Coverage, Opinions and Visuals",
+        "source": "www.trtworld.com",
+        "url": "https://www.trtworld.com/"
+      }
+    ]
   }
 }

@@ -46,7 +46,7 @@ export default function Home() {
   };
 
   return (
-    <main className="w-full h-screen overflow-hidden relative">
+    <main className="w-full h-screen overflow-hidden relative" style={{ background: '#000000' }}>
       {/* Parallax Starfield Background */}
       <div
         ref={parallaxRef}
@@ -56,6 +56,7 @@ export default function Home() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           pointerEvents: 'none',
+          opacity: 1,
         }}
       />
       
