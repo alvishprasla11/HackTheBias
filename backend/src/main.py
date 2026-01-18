@@ -7,7 +7,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
-from src.agent import NewsAnalysisAgent, NewsAnalysis
+from .agent import NewsAnalysisAgent, NewsAnalysis
 
 # Load environment variables from .env file
 load_dotenv()
