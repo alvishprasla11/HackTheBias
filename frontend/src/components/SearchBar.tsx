@@ -124,7 +124,7 @@ export default function SearchBar({ onAnalyze }: SearchBarProps) {
         onClick={() => setIsMobileExpanded(!isMobileExpanded)}
         className="md:hidden w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-yellow-600/30 
                    flex items-center justify-center text-yellow-500 hover:border-yellow-500/60 
-                   transition-all duration-300 shadow-lg shadow-black/50"
+                   transition-all duration-300 shadow-lg shadow-black/50 mt-1"
         aria-label="Search"
       >
         <svg
@@ -144,7 +144,7 @@ export default function SearchBar({ onAnalyze }: SearchBarProps) {
 
       {/* Mobile Expanded Search */}
       {isMobileExpanded && (
-        <div className="md:hidden fixed inset-x-4 top-20 z-50">
+        <div className="md:hidden fixed inset-x-4 top-[85px] z-50">
           <div className="relative">
             <input
               type="text"
