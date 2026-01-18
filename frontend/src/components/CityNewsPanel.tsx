@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 interface CityNewsPanelProps {
   cityName: string;
   country: string;
-  onNewsClick: (newsItem: any) => void;
+  onNewsClick: (topic: string, location: string) => void;
   onClose: () => void;
 }
 
@@ -153,7 +153,7 @@ export default function CityNewsPanel({ cityName, country, onNewsClick, onClose 
           news.map((item, idx) => (
             <div
               key={item.id || idx}
-              onClick={() => onNewsClick(item)}
+              onClick={() => onNewsClick(item.title, `${cityName}, ${country}`)}
               style={{
                 background: 'transparent',
                 borderRadius: '4px',

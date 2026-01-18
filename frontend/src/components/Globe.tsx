@@ -13,7 +13,8 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
   const globeRef = useRef<any>(null);
   const mountRef = useRef<HTMLDivElement>(null);
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
-  const [selectedNews, setSelectedNews] = useState<any>(null);
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [selectedLocationString, setSelectedLocationString] = useState<string | null>(null);
   const [cityLabels, setCityLabels] = useState<any[]>([]);
   const [currentAltitude, setCurrentAltitude] = useState<number>(2.5); // Track zoom level
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -516,11 +517,15 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
       })}
       
       {/* City News Panel - Hide when TOP 10 NEWS is expanded */}
-      {selectedLocation && !selectedNews && !isTrendingExpanded && (
+      {selectedLocation && !selectedTopic && !isTrendingExpanded && (
         <CityNewsPanel
           cityName={selectedLocation.name}
           country={selectedLocation.country}
-          onNewsClick={(newsItem) => setSelectedNews(newsItem)}
+          onNewsClick={(topic, location) => {
+            console.log('News clicked - Topic:', topic, 'Location:', location);
+            setSelectedTopic(topic);
+            setSelectedLocationString(location);
+          }}
           onClose={() => {
             setSelectedLocation(null);
             isPanelOpenRef.current = false;
@@ -533,10 +538,14 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
       )}
       
       {/* Analysis View */}
-      {selectedNews && (
+      {selectedTopic && (
         <AnalysisView
-          analysis={selectedNews}
-          onClose={() => setSelectedNews(null)}
+          topic={selectedTopic}
+          location={selectedLocationString || undefined}
+          onClose={() => {
+            setSelectedTopic(null);
+            setSelectedLocationString(null);
+          }}
         />
       )}
     </div>

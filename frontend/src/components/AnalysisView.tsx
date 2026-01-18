@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Source {
   name: string;
@@ -58,6 +58,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
   const [isLoading, setIsLoading] = useState(!initialAnalysis);
   const [error, setError] = useState<string | null>(null);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const hasFetchedRef = useRef(false);
 
   // Cycle through loading messages
   useEffect(() => {
@@ -72,22 +73,29 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
 
   // Fetch analysis if not provided
   useEffect(() => {
-    if (initialAnalysis || !topic) return;
+    if (initialAnalysis || !topic || hasFetchedRef.current) return;
+
+    hasFetchedRef.current = true;
 
     const fetchAnalysis = async () => {
       setIsLoading(true);
       setError(null);
 
+      console.log('Fetching analysis with:', { topic, location });
+
       try {
+        const requestBody = {
+          location: location || 'Global',
+          topic: topic,
+        };
+        console.log('Sending request:', requestBody);
+
         const response = await fetch('http://localhost:8000/analyze', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            location: location || 'Global',
-            topic: topic,
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {
