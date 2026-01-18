@@ -19,6 +19,7 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const altitudeRef = useRef<number>(2.5);
+  const isPanelOpenRef = useRef<boolean>(false);
 
   // Function to pause rotation on user interaction (optimized with useCallback)
   const pauseRotation = useCallback(() => {
@@ -35,8 +36,9 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
     }
 
     // Set new timer to resume rotation after 2.5 seconds of inactivity
+    // Only resume if no city news panel is open
     inactivityTimerRef.current = setTimeout(() => {
-      if (globeRef.current && globeRef.current.controls()) {
+      if (globeRef.current && globeRef.current.controls() && !isPanelOpenRef.current) {
         globeRef.current.controls().autoRotate = true;
       }
     }, 2500); // 2.5 seconds
@@ -57,6 +59,7 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
       
       // Set selected location immediately to show panel
       setSelectedLocation(locationData);
+      isPanelOpenRef.current = true;
 
       // TODO: Replace with your actual backend endpoint
       const response = await fetch('/api/location', {
@@ -102,6 +105,7 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
                 .filter((p: any) => p.properties.name !== 'Pune') // Remove Pune
                 .filter((p: any) => p.properties.name !== 'Amravati') // Remove Amravati
                 .filter((p: any) => p.properties.name !== 'Bogota') // Remove duplicate Bogota
+                .filter((p: any) => p.properties.name !== 'Shenzhen') // Remove Shenzhen
                 .sort((a: any, b: any) => (b.properties.pop_max || 0) - (a.properties.pop_max || 0))
                 .slice(0, 30); // Significantly reduced for performance
 
@@ -167,9 +171,9 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
                 { name: 'Kuwait City', lat: 29.3759, lng: 47.9774, pop_max: 3052000, country: 'Kuwait' },
                 { name: 'Muscat', lat: 23.5880, lng: 58.3829, pop_max: 1623000, country: 'Oman' },
                 { name: 'Jeddah', lat: 21.5433, lng: 39.1728, pop_max: 4610000, country: 'Saudi Arabia' },
-                { name: 'Tel Aviv', lat: 32.0853, lng: 34.7818, pop_max: 4181000, country: 'Israel' },
                 { name: 'Jerusalem', lat: 31.7683, lng: 35.2137, pop_max: 936000, country: 'Israel' },
                 { name: 'Gaza City', lat: 31.5000, lng: 34.4667, pop_max: 590000, country: 'Palestine' },
+                { name: 'Kyiv', lat: 50.4501, lng: 30.5234, pop_max: 2950000, country: 'Ukraine' },
                 
                 // Australia & Oceania
                 { name: 'Sydney', lat: -33.8688, lng: 151.2093, pop_max: 5312000, country: 'Australia' },
@@ -265,6 +269,15 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
                   // Close TOP 10 NEWS if open
                   onGlobeInteraction?.();
                   
+                  // Clear any pending rotation resume timers
+                  if (inactivityTimerRef.current) {
+                    clearTimeout(inactivityTimerRef.current);
+                    inactivityTimerRef.current = null;
+                  }
+                  
+                  // Pause rotation when city is clicked
+                  pauseRotation();
+                  
                   // Send to backend
                   sendLocationToBackend(point);
 
@@ -295,7 +308,10 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
 
               // When user stops interacting (mouse up, drag end)
               controls.addEventListener('end', () => {
-                resumeRotationAfterDelay();
+                // Only resume rotation if no city panel is open
+                if (!isPanelOpenRef.current) {
+                  resumeRotationAfterDelay();
+                }
               });
 
               // Update visible cities when zoom changes
@@ -505,7 +521,14 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
           cityName={selectedLocation.name}
           country={selectedLocation.country}
           onNewsClick={(newsItem) => setSelectedNews(newsItem)}
-          onClose={() => setSelectedLocation(null)}
+          onClose={() => {
+            setSelectedLocation(null);
+            isPanelOpenRef.current = false;
+            // Resume rotation when panel is closed
+            if (globeRef.current && globeRef.current.controls()) {
+              globeRef.current.controls().autoRotate = true;
+            }
+          }}
         />
       )}
       
