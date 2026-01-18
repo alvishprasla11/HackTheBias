@@ -148,7 +148,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ paddingTop: '120px' }}>
+    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-6" style={{ paddingTop: '120px' }}>
       {/* Backdrop - Semi-transparent to show globe */}
       <div 
         className="absolute inset-0 bg-black/40" 
@@ -162,14 +162,14 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
           <div className="flex justify-between items-start">
             <div className="flex-1">
               <h1 
-                className="text-xl font-bold text-yellow-500 tracking-wider mb-1"
+                className="text-base md:text-xl font-bold text-yellow-500 tracking-wider mb-1"
                 style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '2px' }}
               >
                 UNBIASED ANALYSIS
               </h1>
               {analysis && (
                 <p 
-                  className="text-xs text-gray-400"
+                  className="text-[10px] md:text-xs text-gray-400"
                   style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.5px' }}
                 >
                   {analysis.location} • {analysis.topic}
@@ -178,9 +178,9 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
             </div>
             <button
               onClick={onClose}
-              className="px-4 py-1.5 bg-black/40 border border-yellow-600/30 rounded
+              className="px-3 md:px-4 py-1.5 bg-black/40 border border-yellow-600/30 rounded
                        text-yellow-500 hover:bg-yellow-600/10 hover:border-yellow-600/60
-                       transition-all duration-300 text-sm"
+                       transition-all duration-300 text-xs md:text-sm"
               style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '1px' }}
             >
             CLOSE
@@ -195,13 +195,13 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-6"></div>
             <p 
-              className="text-yellow-500 text-lg animate-pulse"
+              className="text-yellow-500 text-sm md:text-lg animate-pulse"
               style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '1px' }}
             >
               {loadingMessages[loadingMessageIndex]}
             </p>
             <p 
-              className="text-gray-500 text-xs mt-2"
+              className="text-gray-500 text-[10px] md:text-xs mt-2"
               style={{ fontFamily: 'monospace, Courier New, Courier' }}
             >
               This may take 30-60 seconds...
@@ -225,9 +225,9 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
         {analysis && !isLoading && (
           <div className="space-y-8">
             {/* Headline */}
-            <div className="bg-black/40 border border-yellow-600/30 rounded-lg p-6">
+            <div className="bg-black/40 border border-yellow-600/30 rounded-lg p-4 md:p-6">
               <h2 
-                className="text-xl text-white leading-relaxed"
+                className="text-base md:text-xl text-white leading-relaxed"
                 style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.5px' }}
               >
                 {analysis.headline}
@@ -241,15 +241,15 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
             </div>
 
             {/* Summary */}
-            <div className="bg-black/40 border border-yellow-600/30 rounded-lg p-6">
+            <div className="bg-black/40 border border-yellow-600/30 rounded-lg p-4 md:p-6">
               <h3 
-                className="text-sm text-yellow-500 mb-3 tracking-wider"
+                className="text-xs md:text-sm text-yellow-500 mb-3 tracking-wider"
                 style={{ fontFamily: 'monospace, Courier New, Courier' }}
               >
                 EXECUTIVE SUMMARY
               </h3>
               <p 
-                className="text-sm text-gray-300 leading-relaxed"
+                className="text-xs md:text-sm text-gray-300 leading-relaxed"
                 style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.3px' }}
               >
                 {analysis.summary}
@@ -259,7 +259,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
             {/* Perspectives */}
             <div>
               <h3 
-                className="text-sm text-yellow-500 mb-4 tracking-wider"
+                className="text-xs md:text-sm text-yellow-500 mb-4 tracking-wider"
                 style={{ fontFamily: 'monospace, Courier New, Courier' }}
               >
                 MULTIPLE PERSPECTIVES
@@ -268,12 +268,12 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                 {analysis.perspectives?.map((perspective, index) => (
                   <div 
                     key={index}
-                    className="bg-black/40 border border-yellow-600/30 rounded-lg p-6 space-y-4"
+                    className="bg-black/40 border border-yellow-600/30 rounded-lg p-4 md:p-6 space-y-4"
                   >
                     {/* Perspective Header */}
                     <div className="flex justify-between items-start">
                       <h4 
-                        className="text-base text-white font-bold"
+                        className="text-sm md:text-base text-white font-bold"
                         style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.5px' }}
                       >
                         {perspective.side_name}
@@ -297,9 +297,9 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
 
                     {/* Summary */}
                     <p 
-                      className="text-xs text-gray-300 leading-relaxed"
+                      className="text-[10px] md:text-xs text-gray-300 leading-relaxed"
                       style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.3px' }}
-                    >
+                      >
                       {perspective.summary}
                     </p>
 
@@ -456,9 +456,9 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
 
             {/* Common Facts */}
             {analysis.common_facts?.length > 0 && (
-              <div className="bg-black/40 border border-green-600/30 rounded-lg p-6">
+              <div className="bg-black/40 border border-green-600/30 rounded-lg p-4 md:p-6">
                 <h3 
-                  className="text-sm text-green-500 mb-3 tracking-wider"
+                  className="text-xs md:text-sm text-green-500 mb-3 tracking-wider"
                   style={{ fontFamily: 'monospace, Courier New, Courier' }}
                 >
                   COMMON GROUND (AGREED FACTS)
@@ -467,7 +467,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                   {analysis.common_facts?.map((fact, i) => (
                     <li 
                       key={i}
-                      className="text-sm text-gray-300 pl-4"
+                      className="text-xs md:text-sm text-gray-300 pl-4"
                       style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.3px' }}
                     >
                       ✓ {fact}
@@ -479,9 +479,9 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
 
             {/* Key Disagreements */}
             {analysis.key_disagreements?.length > 0 && (
-              <div className="bg-black/40 border border-red-600/30 rounded-lg p-6">
+              <div className="bg-black/40 border border-red-600/30 rounded-lg p-4 md:p-6">
                 <h3 
-                  className="text-sm text-red-500 mb-3 tracking-wider"
+                  className="text-xs md:text-sm text-red-500 mb-3 tracking-wider"
                   style={{ fontFamily: 'monospace, Courier New, Courier' }}
                 >
                   KEY DISAGREEMENTS
@@ -490,7 +490,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                   {analysis.key_disagreements?.map((disagreement, i) => (
                     <li 
                       key={i}
-                      className="text-sm text-gray-300 pl-4"
+                      className="text-xs md:text-sm text-gray-300 pl-4"
                       style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.3px' }}
                     >
                       ⚔️ {disagreement}
@@ -502,9 +502,9 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
 
             {/* Social Media Voices */}
             {analysis.social_media_voices?.length > 0 && (
-              <div className="bg-black/40 border border-blue-600/30 rounded-lg p-6">
+              <div className="bg-black/40 border border-blue-600/30 rounded-lg p-4 md:p-6">
                 <h3 
-                  className="text-sm text-blue-500 mb-3 tracking-wider"
+                  className="text-xs md:text-sm text-blue-500 mb-3 tracking-wider"
                   style={{ fontFamily: 'monospace, Courier New, Courier' }}
                 >
                   INDEPENDENT VOICES
@@ -565,15 +565,15 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
             )}
 
             {/* Information Quality */}
-            <div className="bg-black/40 border border-yellow-600/30 rounded-lg p-6">
+            <div className="bg-black/40 border border-yellow-600/30 rounded-lg p-4 md:p-6">
               <h3 
-                className="text-sm text-yellow-500 mb-3 tracking-wider"
+                className="text-xs md:text-sm text-yellow-500 mb-3 tracking-wider"
                 style={{ fontFamily: 'monospace, Courier New, Courier' }}
               >
                 INFORMATION QUALITY ASSESSMENT
               </h3>
               <p 
-                className="text-sm text-gray-300 leading-relaxed"
+                className="text-xs md:text-sm text-gray-300 leading-relaxed"
                 style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.3px' }}
               >
                 {analysis.information_quality || 'Analysis in progress...'}

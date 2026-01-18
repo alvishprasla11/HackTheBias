@@ -1233,5 +1233,60 @@
         "url": "https://news.google.com/home?hl=en-IN&gl=IN&ceid=IN%3Aen"
       }
     ]
+  },
+  "manila philippines": {
+    "date": "2026-01-17",
+    "headlines": [
+      {
+        "headline": "Manila - latest news, breaking stories and comment",
+        "source": "www.independent.co.uk",
+        "url": "https://www.independent.co.uk/topic/manila"
+      },
+      {
+        "headline": "Inquirer.net: Latest Philippines Headlines, Breaking News ...",
+        "source": "www.inquirer.net",
+        "url": "https://www.inquirer.net/"
+      },
+      {
+        "headline": "Philippines | Today's latest from Al Jazeera",
+        "source": "www.aljazeera.com",
+        "url": "https://www.aljazeera.com/where/philippines/"
+      },
+      {
+        "headline": "Manila - BBC News",
+        "source": "www.bbc.com",
+        "url": "https://www.bbc.com/news/topics/c2rnyqz6mp4t"
+      },
+      {
+        "headline": "The Manila Times | News | Opinion | Philippines | Asia | World",
+        "source": "www.manilatimes.net",
+        "url": "https://www.manilatimes.net/"
+      },
+      {
+        "headline": "Latest Philippine and International News | GMA News Online",
+        "source": "www.gmanetwork.com",
+        "url": "https://www.gmanetwork.com/news/"
+      },
+      {
+        "headline": "Philstar.com | Latest Philippine news and multimedia",
+        "source": "www.philstar.com",
+        "url": "https://www.philstar.com/"
+      },
+      {
+        "headline": "Google News",
+        "source": "news.google.com",
+        "url": "https://news.google.com/home?hl=en-PH&gl=PH&ceid=PH%3Aen"
+      },
+      {
+        "headline": "ABS-CBN: Leading Entertainment and News Network",
+        "source": "www.abs-cbn.com",
+        "url": "https://www.abs-cbn.com/"
+      },
+      {
+        "headline": "Philippine News Agency",
+        "source": "www.pna.gov.ph",
+        "url": "https://www.pna.gov.ph/"
+      }
+    ]
   }
 }
