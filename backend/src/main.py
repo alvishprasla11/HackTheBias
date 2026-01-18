@@ -50,6 +50,61 @@ agent: Optional[NewsAnalysisAgent] = None
 
 # Daily news cache file path
 CACHE_FILE = Path(__file__).parent.parent / "daily_news_cache.json"
+SEARCH_CACHE_FILE = Path(__file__).parent.parent / "search_cache.json"
+
+
+def load_search_cache() -> Dict[str, Any]:
+    """Load search cache from file"""
+    if not SEARCH_CACHE_FILE.exists():
+        return {}
+    
+    try:
+        with open(SEARCH_CACHE_FILE, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"⚠️  Error loading search cache: {e}")
+        return {}
+
+
+def save_search_cache(cache: Dict[str, Any]):
+    """Save search cache to file"""
+    try:
+        with open(SEARCH_CACHE_FILE, 'w') as f:
+            json.dump(cache, f, indent=2)
+    except Exception as e:
+        print(f"⚠️  Error saving search cache: {e}")
+
+
+def get_cached_search(topic: str) -> Optional[List[Dict[str, str]]]:
+    """Get cached search results if they exist and are from today"""
+    cache = load_search_cache()
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    topic_key = topic.lower().strip()
+    
+    if topic_key in cache:
+        cached_data = cache[topic_key]
+        if cached_data.get('date') == today:
+            print(f"✅ Using cached search results for: {topic}")
+            return cached_data.get('headlines', [])
+    
+    return None
+
+
+def cache_search_results(topic: str, headlines: List[Dict[str, str]]):
+    """Cache search results with today's date"""
+    cache = load_search_cache()
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    topic_key = topic.lower().strip()
+    
+    cache[topic_key] = {
+        'date': today,
+        'headlines': headlines
+    }
+    
+    save_search_cache(cache)
+    print(f"💾 Cached search results for: {topic}")
 
 
 def load_daily_news() -> Optional[Dict[str, Any]]:
@@ -308,6 +363,16 @@ async def search_topic(request: SearchRequest):
             detail="Agent not initialized. Please set GEMINI_API_KEY and TAVILY_API_KEY environment variables."
         )
     
+    # Check cache first
+    cached_headlines = get_cached_search(request.topic)
+    if cached_headlines:
+        return SearchResponse(
+            topic=request.topic,
+            searched_at=datetime.now().isoformat(),
+            count=len(cached_headlines),
+            headlines=cached_headlines
+        )
+    
     try:
         # Use Tavily search to get headlines about the topic
         from langchain_tavily import TavilySearch
@@ -351,6 +416,9 @@ async def search_topic(request: SearchRequest):
                     })
         
         print(f"✅ Found {len(headlines)} headlines")
+        
+        # Cache the results
+        cache_search_results(request.topic, headlines)
         
         return SearchResponse(
             topic=request.topic,

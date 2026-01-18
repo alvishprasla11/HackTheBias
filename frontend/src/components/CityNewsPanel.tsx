@@ -1,57 +1,92 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface CityNewsPanelProps {
   cityName: string;
   country: string;
+  cachedNews?: any[];
+  onNewsFetched: (news: any[]) => void;
   onNewsClick: (topic: string, location: string) => void;
   onClose: () => void;
 }
 
-export default function CityNewsPanel({ cityName, country, onNewsClick, onClose }: CityNewsPanelProps) {
-  const [news, setNews] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function CityNewsPanel({ cityName, country, cachedNews, onNewsFetched, onNewsClick, onClose }: CityNewsPanelProps) {
+  const [news, setNews] = useState<any[]>(cachedNews || []);
+  const [loading, setLoading] = useState(!cachedNews);
   const [error, setError] = useState<string | null>(null);
+  const hasFetchedRef = useRef(false);
+  const currentCityRef = useRef(`${cityName}-${country}`);
 
   useEffect(() => {
+    const cityKey = `${cityName}-${country}`;
+    
+    // If city changed, reset fetch flag
+    if (currentCityRef.current !== cityKey) {
+      currentCityRef.current = cityKey;
+      hasFetchedRef.current = false;
+    }
+    
+    // If we have cached news, use it and don't fetch
+    if (cachedNews && cachedNews.length > 0) {
+      setNews(cachedNews);
+      setLoading(false);
+      hasFetchedRef.current = true;
+      return;
+    }
+    
+    // Prevent duplicate fetches
+    if (hasFetchedRef.current) {
+      return;
+    }
+    
+    hasFetchedRef.current = true;
+
     const fetchCityNews = async () => {
       setLoading(true);
       setError(null);
       
+      console.log(`Fetching news for ${cityKey}`);
+      
       try {
-        // TODO: Replace with your actual backend endpoint
-        const response = await fetch(`/api/news/city?name=${encodeURIComponent(cityName)}&country=${encodeURIComponent(country)}`);
+        // Call backend /search endpoint with city name
+        const response = await fetch('http://localhost:8000/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            topic: `${cityName} ${country}` 
+          }),
+        });
         
         if (response.ok) {
           const data = await response.json();
-          setNews(data.slice(0, 10)); // Top 10 news
+          // Map headlines to news format
+          const headlines = data.headlines.map((item: any, index: number) => ({
+            id: index + 1,
+            title: item.headline,
+            source: item.source,
+            url: item.url,
+            time: 'Recent'
+          }));
+          const topNews = headlines.slice(0, 10);
+          setNews(topNews);
+          onNewsFetched(topNews); // Store in cache
         } else {
-          // Use mock data if API not available
           throw new Error('API not available');
         }
       } catch (err) {
-        console.log('Using mock data - API endpoint not configured yet');
-        // Mock data for development
-        setNews([
-          { id: 1, title: `Breaking: Major development in ${cityName}`, source: 'Reuters', time: '2h ago' },
-          { id: 2, title: `${cityName} announces new initiative`, source: 'AP News', time: '4h ago' },
-          { id: 3, title: `Economic growth in ${cityName} region`, source: 'Bloomberg', time: '6h ago' },
-          { id: 4, title: `Technology sector boom in ${cityName}`, source: 'TechCrunch', time: '5h ago' },
-          { id: 5, title: `${cityName} weather update for the week`, source: 'Weather Network', time: '8h ago' },
-          { id: 6, title: `Local news from ${cityName}`, source: 'Local Times', time: '10h ago' },
-          { id: 7, title: `${cityName} transportation updates`, source: 'Transit News', time: '12h ago' },
-          { id: 8, title: `Cultural events in ${cityName} this weekend`, source: 'Arts & Culture', time: '14h ago' },
-          { id: 9, title: `${cityName} real estate market analysis`, source: 'Property Watch', time: '16h ago' },
-          { id: 10, title: `Sports highlights from ${cityName}`, source: 'Sports Daily', time: '18h ago' },
-        ]);
+        console.error('Error fetching city news:', err);
+        setError('Failed to load news for this city');
+        setNews([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchCityNews();
-  }, [cityName, country]);
+  }, [cityName, country, cachedNews]);
 
   return (
     <div

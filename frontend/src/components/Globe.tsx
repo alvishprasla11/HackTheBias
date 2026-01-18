@@ -21,6 +21,7 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
   const animationFrameRef = useRef<number | null>(null);
   const altitudeRef = useRef<number>(2.5);
   const isPanelOpenRef = useRef<boolean>(false);
+  const newsCacheRef = useRef<Map<string, any[]>>(new Map());
 
   // Function to pause rotation on user interaction (optimized with useCallback)
   const pauseRotation = useCallback(() => {
@@ -521,6 +522,10 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
         <CityNewsPanel
           cityName={selectedLocation.name}
           country={selectedLocation.country}
+          cachedNews={newsCacheRef.current.get(`${selectedLocation.name}-${selectedLocation.country}`)}
+          onNewsFetched={(news) => {
+            newsCacheRef.current.set(`${selectedLocation.name}-${selectedLocation.country}`, news);
+          }}
           onNewsClick={(topic, location) => {
             console.log('News clicked - Topic:', topic, 'Location:', location);
             setSelectedTopic(topic);
