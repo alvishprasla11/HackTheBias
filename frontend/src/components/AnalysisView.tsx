@@ -91,8 +91,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
         console.log('Sending request:', requestBody);
 
         const API_URLS = [
-          process.env.NEXT_PUBLIC_API_URL,
-          'http://localhost:8000'
+          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
         ];
         
         let response;

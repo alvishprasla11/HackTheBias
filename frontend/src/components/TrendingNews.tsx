@@ -58,8 +58,7 @@ export default function TrendingNews({ onAnalyze, onExpandChange, forceCollapse 
       
       try {
         const API_URLS = [
-          process.env.NEXT_PUBLIC_API_URL,
-          'http://localhost:8000'
+          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
         ];
         
         let response;

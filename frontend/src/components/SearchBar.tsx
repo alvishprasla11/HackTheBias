@@ -51,8 +51,7 @@ export default function SearchBar({ onAnalyze }: SearchBarProps) {
 
     try {
       const API_URLS = [
-        process.env.NEXT_PUBLIC_API_URL,
-        'http://localhost:8000'
+        process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
       ];
       
       let response;
