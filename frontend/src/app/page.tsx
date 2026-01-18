@@ -61,17 +61,17 @@ export default function Home() {
       />
       
       {/* Header Overlay */}
-      <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/60 to-transparent p-6">
-        <div className="flex justify-between items-start">
-          <div className="pointer-events-none">
-            <h1 className="text-4xl font-bold text-white tracking-wider" style={{ fontFamily: 'monospace, Courier New, Courier' }}>
+      <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/60 to-transparent p-4 md:p-6">
+        <div className="flex justify-between items-start gap-2">
+          <div className="pointer-events-none flex-shrink min-w-0">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-wider break-words" style={{ fontFamily: 'monospace, Courier New, Courier' }}>
               TRUTH<span className="text-red-500">UNFILTERED</span>
             </h1>
-            <p className="text-gray-300 text-sm mt-2" style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.3px' }}>Global News Network • Amplify the Silenced • Question the Powerful</p>
+            <p className="text-gray-300 text-xs sm:text-sm mt-1 md:mt-2" style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.3px' }}>Global News Network • Amplify the Silenced • Question the Powerful</p>
           </div>
           
           {/* Search Bar - Top Right */}
-          <div className="pointer-events-auto">
+          <div className="pointer-events-auto flex-shrink-0">
             <SearchBar onAnalyze={handleSearchAnalyze} />
           </div>
         </div>
@@ -85,8 +85,8 @@ export default function Home() {
         <Globe isTrendingExpanded={isTrendingExpanded} onGlobeInteraction={() => setCollapseTrending(prev => prev + 1)} />
       </div>
 
-      {/* Legend Overlay - Bottom Right */}
-      <div className="absolute bottom-6 right-6 z-30 bg-black/75 backdrop-blur-sm rounded-lg p-4 text-white text-xs border border-yellow-600/30" style={{ fontFamily: 'monospace, Courier New, Courier' }}>
+      {/* Legend Overlay - Bottom Right - Hidden on mobile */}
+      <div className="hidden md:block absolute bottom-6 right-6 z-30 bg-black/75 backdrop-blur-sm rounded-lg p-4 text-white text-xs border border-yellow-600/30" style={{ fontFamily: 'monospace, Courier New, Courier' }}>
         <h3 className="font-bold mb-3 text-yellow-500" style={{ letterSpacing: '0.5px' }}>NEWS HUB IMPORTANCE</h3>
         <div className="space-y-2">
           <div className="flex items-center gap-2">

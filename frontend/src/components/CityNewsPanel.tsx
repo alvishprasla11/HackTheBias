@@ -109,11 +109,8 @@ export default function CityNewsPanel({ cityName, country, cachedNews, onNewsFet
 
   return (
     <div
+      className="fixed top-[120px] left-1/2 -translate-x-1/2 md:left-10 md:translate-x-0 w-[90vw] max-w-[380px] md:w-[380px]"
       style={{
-        position: 'fixed',
-        top: '120px',
-        left: '40px',
-        width: '380px',
         maxHeight: '75vh',
         background: '#000',
         border: '1px solid #ffa500',

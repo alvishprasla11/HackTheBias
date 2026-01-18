@@ -137,19 +137,29 @@ export default function TrendingNews({ onAnalyze, onExpandChange, forceCollapse 
         /* Sidebar Container */
         .sidebar-container {
           position: fixed;
-          left: 24px;
+          left: 50%;
           bottom: 24px;
-          z-index: 40;
+          transform: translateX(-50%);
+          z-index: 1000;
           background: rgba(0, 0, 0, 0.8);
           backdrop-filter: blur(20px);
           border: 1px solid rgba(234, 179, 8, 0.3);
           border-radius: 12px;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           width: 280px;
+          max-width: calc(100vw - 32px);
           height: 50px;
           display: flex;
           flex-direction: column;
           overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+          .sidebar-container {
+            left: 24px;
+            transform: none;
+            z-index: 40;
+          }
         }
 
         .sidebar-container.expanded {
@@ -293,16 +303,17 @@ export default function TrendingNews({ onAnalyze, onExpandChange, forceCollapse 
 
         /* Responsive */
         @media (max-width: 768px) {
-          .sidebar-container.expanded {
-            width: 320px;
-          } {
+          .sidebar-container {
             width: calc(100vw - 48px);
             left: 24px;
             right: 24px;
+            transform: none;
           }
           
           .sidebar-container.expanded {
-            height: 50
+            height: 500px;
+            max-height: 70vh;
+          }
       `}</style>
     </>
   );
