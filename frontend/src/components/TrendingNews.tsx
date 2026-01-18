@@ -57,7 +57,8 @@ export default function TrendingNews({ onAnalyze, onExpandChange, forceCollapse 
       setError(null);
       
       try {
-        const API_URLS = ['https://truthunfiltered.onrender.com',
+        const API_URLS = [
+          process.env.NEXT_PUBLIC_API_URL,
           'http://localhost:8000'
         ];
         

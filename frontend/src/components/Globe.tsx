@@ -63,19 +63,10 @@ export default function GlobeComponent({ isTrendingExpanded = false, onGlobeInte
       setSelectedLocation(locationData);
       isPanelOpenRef.current = true;
 
-      // TODO: Replace with your actual backend endpoint
-      const response = await fetch('/api/location', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(locationData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Backend response:', data);
-      }
+      // Backend location tracking - currently not implemented
+      // TODO: Implement backend endpoint if location tracking is needed
+      /*
+      
     } catch (error) {
       console.error('Error sending location to backend:', error);
     }

@@ -50,7 +50,8 @@ export default function CityNewsPanel({ cityName, country, cachedNews, onNewsFet
       
       try {
         // Call backend /search endpoint with city name
-        const API_URLS = ['https://truthunfiltered.onrender.com',
+        const API_URLS = [
+          process.env.NEXT_PUBLIC_API_URL,
           'http://localhost:8000'
         ];
         
