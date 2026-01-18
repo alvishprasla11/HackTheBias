@@ -146,9 +146,9 @@ For detailed agent architecture and workflow, see [backend/AGENT_GUIDE.md](backe
 
 The frontend will be available at `http://localhost:3000`
 
-## Live Demo 
+## Live Platform 
 
-** Website link:** https://truth-unfiltered.vercel.app/
+**TruthUnfiltered:** https://truth-unfiltered.vercel.app/
 
 ---
 
