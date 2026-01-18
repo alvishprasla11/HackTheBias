@@ -50,17 +50,35 @@ export default function SearchBar({ onAnalyze }: SearchBarProps) {
     setIsLoading(true);
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://truthunfiltered.onrender.com';
-      const response = await fetch(`${API_URL}/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ topic: searchQuery }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Search failed');
+      const API_URLS = ['https://truthunfiltered.onrender.com',
+        'http://localhost:8000'
+      ];
+      
+      let response;
+      let lastError;
+      
+      for (const API_URL of API_URLS) {
+        try {
+          response = await fetch(`${API_URL}/search`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ topic: searchQuery }),
+          });
+          
+          if (response.ok) {
+            break;
+          }
+          lastError = new Error('Search failed');
+        } catch (err) {
+          lastError = err;
+          continue;
+        }
+      }
+      
+      if (!response || !response.ok) {
+        throw lastError || new Error('Search failed');
       }
 
       const data: SearchResponse = await response.json();

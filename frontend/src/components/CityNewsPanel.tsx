@@ -50,18 +50,36 @@ export default function CityNewsPanel({ cityName, country, cachedNews, onNewsFet
       
       try {
         // Call backend /search endpoint with city name
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://truthunfiltered.onrender.com';
-        const response = await fetch(`${API_URL}/search`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            topic: `${cityName} ${country}` 
-          }),
-        });
+        const API_URLS = ['https://truthunfiltered.onrender.com',
+          'http://localhost:8000'
+        ];
         
-        if (response.ok) {
+        let response;
+        let lastError;
+        
+        for (const API_URL of API_URLS) {
+          try {
+            response = await fetch(`${API_URL}/search`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ 
+                topic: `${cityName} ${country}` 
+              }),
+            });
+            
+            if (response.ok) {
+              break;
+            }
+            lastError = new Error('Search failed');
+          } catch (err) {
+            lastError = err;
+            continue;
+          }
+        }
+        
+        if (response && response.ok) {
           const data = await response.json();
           // Map headlines to news format
           const headlines = data.headlines.map((item: any, index: number) => ({

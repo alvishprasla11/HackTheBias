@@ -90,16 +90,35 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
         };
         console.log('Sending request:', requestBody);
 
-        const response = await fetch('http://localhost:8000/analyze', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
-
-        if (!response.ok) {
-          throw new Error('Analysis failed');
+        const API_URLS = ['https://truthunfiltered.onrender.com',
+          'http://localhost:8000'
+        ];
+        
+        let response;
+        let lastError;
+        
+        for (const API_URL of API_URLS) {
+          try {
+            response = await fetch(`${API_URL}/analyze`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestBody),
+            });
+            
+            if (response.ok) {
+              break;
+            }
+            lastError = new Error('Analysis failed');
+          } catch (err) {
+            lastError = err;
+            continue;
+          }
+        }
+        
+        if (!response || !response.ok) {
+          throw lastError || new Error('Analysis failed');
         }
 
         const data: Analysis = await response.json();

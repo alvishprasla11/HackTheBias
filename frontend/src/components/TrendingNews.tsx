@@ -57,11 +57,29 @@ export default function TrendingNews({ onAnalyze, onExpandChange, forceCollapse 
       setError(null);
       
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://truthunfiltered.onrender.com';
-        const response = await fetch(`${API_URL}/daily-news`);
+        const API_URLS = ['https://truthunfiltered.onrender.com',
+          'http://localhost:8000'
+        ];
         
-        if (!response.ok) {
-          throw new Error('Failed to fetch daily news');
+        let response;
+        let lastError;
+        
+        for (const API_URL of API_URLS) {
+          try {
+            response = await fetch(`${API_URL}/daily-news`);
+            
+            if (response.ok) {
+              break;
+            }
+            lastError = new Error('Failed to fetch daily news');
+          } catch (err) {
+            lastError = err;
+            continue;
+          }
+        }
+        
+        if (!response || !response.ok) {
+          throw lastError || new Error('Failed to fetch daily news');
         }
         
         const data: DailyNewsResponse = await response.json();
