@@ -31,9 +31,9 @@ interface Analysis {
   headline: string;
   date_analyzed: string;
   perspectives: Perspective[];
-  common_facts: string[];
-  key_disagreements: string[];
-  social_media_voices: Source[];
+  common_facts?: string[];
+  key_disagreements?: string[];
+  social_media_voices?: Source[];
   summary: string;
   information_quality: string;
 }
@@ -430,7 +430,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
             )}
 
             {/* Key Disagreements */}
-            {analysis.key_disagreements.length > 0 && (
+            {analysis.key_disagreements?.length > 0 && (
               <div className="bg-black/40 border border-red-600/30 rounded-lg p-6">
                 <h3 
                   className="text-sm text-red-500 mb-3 tracking-wider"
@@ -453,7 +453,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
             )}
 
             {/* Social Media Voices */}
-            {analysis.social_media_voices.length > 0 && (
+            {analysis.social_media_voices?.length > 0 && (
               <div className="bg-black/40 border border-blue-600/30 rounded-lg p-6">
                 <h3 
                   className="text-sm text-blue-500 mb-3 tracking-wider"
@@ -528,7 +528,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                 className="text-sm text-gray-300 leading-relaxed"
                 style={{ fontFamily: 'monospace, Courier New, Courier', letterSpacing: '0.3px' }}
               >
-                {analysis.information_quality}
+                {analysis.information_quality || 'Analysis in progress...'}
               </p>
             </div>
           </div>
