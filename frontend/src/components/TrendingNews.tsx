@@ -57,7 +57,8 @@ export default function TrendingNews({ onAnalyze, onExpandChange, forceCollapse 
       setError(null);
       
       try {
-        const response = await fetch('http://localhost:8000/daily-news');
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const response = await fetch(`${API_URL}/daily-news`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch daily news');
