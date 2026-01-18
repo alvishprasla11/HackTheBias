@@ -317,10 +317,30 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                           SOURCES:
                         </p>
                         <div className="space-y-2">
-                          {perspective.sources?.map((source, i) => (
+                          {perspective.sources?.map((source, i) => {
+                            // Safely get hostname from URL with fallback
+                            const getHostname = (url: string) => {
+                              try {
+                                return new URL(url).hostname.replace('www.', '');
+                              } catch {
+                                return 'source';
+                              }
+                            };
+
+                            // Create safe URL with fallback to Google search
+                            const safeUrl = (() => {
+                              try {
+                                new URL(source.url);
+                                return source.url;
+                              } catch {
+                                return `https://www.google.com/search?q=${encodeURIComponent(source.name || 'news')}`;
+                              }
+                            })();
+
+                            return (
                             <a
                               key={i}
-                              href={source.url}
+                              href={safeUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="block text-xs hover:bg-yellow-600/10 p-2 rounded transition-colors border border-transparent hover:border-yellow-600/30 group"
@@ -348,7 +368,7 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                                       className="text-[10px] text-gray-600 group-hover:text-gray-500 transition-colors truncate block mt-1"
                                       style={{ fontFamily: 'monospace, Courier New, Courier' }}
                                     >
-                                      {new URL(source.url).hostname.replace('www.', '')}
+                                      {getHostname(source.url)}
                                     </span>
                                   )}
                                 </div>
@@ -364,7 +384,8 @@ export default function AnalysisView({ analysis: initialAnalysis, topic, locatio
                                 </span>
                               </div>
                             </a>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
