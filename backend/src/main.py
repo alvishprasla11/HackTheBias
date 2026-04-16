@@ -287,8 +287,8 @@ async def startup_event():
             await fetch_daily_news()
 
 
-@app.get("/")
-def hello():
+@app.api_route("/", methods=["GET", "HEAD"])
+async def hello():
     return {
         "message": "Multi-Perspective News Analysis API",
         "status": "running",
